@@ -164,7 +164,7 @@ public class ClientNode implements Runnable
 					int serResult = Integer.parseInt(splittedResult[2]);
 					int searchNodePort = Integer.parseInt(st[3]);
 					String searchNodeIP = st[2];
-					int hopCount = Integer.parseInt(st[st.length-1]) + 1;
+					int hopCount = Integer.parseInt(st[5]) + 1;
 	        	  
 					if(serResult == 0 || serResult == 9999 || serResult == 9998)
 					{
@@ -189,7 +189,7 @@ public class ClientNode implements Runnable
 					else
 					{
 						// File found
-						//System.out.println("File found at: " + System.nanoTime());
+						System.out.println("File found at: " + System.nanoTime());
 						String fileList = "";
 						for(int i=0; i<alMatchingFileNameList.size(); i++)
 						{
@@ -215,9 +215,7 @@ public class ClientNode implements Runnable
 		        	  
 					if(iNoOfFiles > 0 && iNoOfFiles < 9998)
 					{
-						System.out.println();
 						System.out.println("Searched file is found!!!");
-						System.out.println("File found at: " + System.nanoTime());
 						System.out.println("Details: " + responseMsg);
 					}
 				}			
@@ -237,12 +235,12 @@ public class ClientNode implements Runnable
 		try
 		{
 			// Print timestamp
-			/*String s = new String(msg, 0, msg.length);
-		    String[] splittedString = s.split("\\s+");
+			String s = new String(msg, 0, msg.length);
+		    String[] splittedString = s.split("\\s+");		         
 			String reqMsg = splittedString[1];
 			if(reqMsg.equals("SER"))
-				System.out.println("Search started at "+ System.nanoTime());*/
-
+				System.out.println("Search started at "+ System.nanoTime());
+			
 			clientSocket.send(sendPacket);
 		}
 		catch (IOException e)
@@ -268,14 +266,14 @@ public class ClientNode implements Runnable
 		// Print timestamp with the message
 	    byte [] data = receivePacket.getData();  
 	    String s = new String(data, 0, receivePacket.getLength());
-	    //String[] splittedString = s.trim().split("\\s+");
-		//String reqResponse = splittedString[1];
-
-		//if(reqResponse.equals("SER") || reqResponse.equals("SEROK"))
-			//System.out.println("Received at "+ System.nanoTime() + " from "+ receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
-		//else
+	    String[] splittedString = s.trim().split("\\s+");		         
+		String reqResponse = splittedString[1];
+		
+		if(reqResponse.equals("SER") || reqResponse.equals("SEROK"))
+			System.out.println("Received at "+ System.nanoTime() + " from "+ receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
+		else
 			System.out.println(receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
-
+		
 	    return receivePacket;
     }
 	  
@@ -297,24 +295,20 @@ public class ClientNode implements Runnable
 		byte bLast = (byte)ilast;
 		int bLast2 = bLast & 0xFF;
 		
-		try
-		{
+		try {
 			InetAddress myIp = InetAddress.getByName(IP);
 			String str  = myIp.getHostAddress();
-		}
-		catch (UnknownHostException e1)
-		{
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 		byte[] ipAddr = new byte[]{Byte.parseByte(splitIP[0]), Byte.parseByte(splitIP[1]), Byte.parseByte(splitIP[2]), bLast};
 		InetAddress IPAddress = null;
-		try
-		{
+		try {
 			IPAddress = InetAddress.getByName(IP);
-		}
-		catch (UnknownHostException e)
-		{
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -541,7 +535,6 @@ public class ClientNode implements Runnable
 	  public void fileSearchOption(String fileName)
 	  {
 		  alMatchingFileNameList.clear();
-		  System.out.println("Search started at "+ System.nanoTime());
 		  ArrayList<String> salSearchMsg = new ArrayList<String>(Arrays.asList("SER",
 			 																   IPAddress.getHostAddress(),
 	 																   		   Integer.toString(listeningPort),
@@ -569,8 +562,8 @@ public class ClientNode implements Runnable
 			  }
 		  }
 		  else
-		  {
-			  System.out.println(alMatchingFileNameList.size()+" File found at: "+ System.nanoTime());
+		  {//System.out.println("Received at "+ System.nanoTime() + " from 
+			  System.out.println(alMatchingFileNameList.size()+" File found at "+ System.nanoTime());
 			  for(int i=0; i<alMatchingFileNameList.size(); i++)
 			  {
 			  System.out.println(i+1+". "+alMatchingFileNameList.get(i));

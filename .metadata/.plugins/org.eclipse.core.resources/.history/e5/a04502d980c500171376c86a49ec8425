@@ -164,7 +164,7 @@ public class ClientNode implements Runnable
 					int serResult = Integer.parseInt(splittedResult[2]);
 					int searchNodePort = Integer.parseInt(st[3]);
 					String searchNodeIP = st[2];
-					int hopCount = Integer.parseInt(st[st.length-1]) + 1;
+					int hopCount = Integer.parseInt(st[5]) + 1;
 	        	  
 					if(serResult == 0 || serResult == 9999 || serResult == 9998)
 					{
@@ -189,7 +189,7 @@ public class ClientNode implements Runnable
 					else
 					{
 						// File found
-						//System.out.println("File found at: " + System.nanoTime());
+						System.out.println("File found at: " + System.nanoTime());
 						String fileList = "";
 						for(int i=0; i<alMatchingFileNameList.size(); i++)
 						{
@@ -215,9 +215,7 @@ public class ClientNode implements Runnable
 		        	  
 					if(iNoOfFiles > 0 && iNoOfFiles < 9998)
 					{
-						System.out.println();
 						System.out.println("Searched file is found!!!");
-						System.out.println("File found at: " + System.nanoTime());
 						System.out.println("Details: " + responseMsg);
 					}
 				}			
@@ -541,7 +539,6 @@ public class ClientNode implements Runnable
 	  public void fileSearchOption(String fileName)
 	  {
 		  alMatchingFileNameList.clear();
-		  System.out.println("Search started at "+ System.nanoTime());
 		  ArrayList<String> salSearchMsg = new ArrayList<String>(Arrays.asList("SER",
 			 																   IPAddress.getHostAddress(),
 	 																   		   Integer.toString(listeningPort),

@@ -215,7 +215,6 @@ public class ClientNode implements Runnable
 		        	  
 					if(iNoOfFiles > 0 && iNoOfFiles < 9998)
 					{
-						System.out.println();
 						System.out.println("Searched file is found!!!");
 						System.out.println("File found at: " + System.nanoTime());
 						System.out.println("Details: " + responseMsg);
