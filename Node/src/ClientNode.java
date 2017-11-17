@@ -189,7 +189,7 @@ public class ClientNode implements Runnable
 					else
 					{
 						// File found
-						//System.out.println("File found at: " + System.nanoTime());
+						System.out.println("File found at: " + System.nanoTime());
 						String fileList = "";
 						for(int i=0; i<alMatchingFileNameList.size(); i++)
 						{
@@ -268,12 +268,12 @@ public class ClientNode implements Runnable
 		// Print timestamp with the message
 	    byte [] data = receivePacket.getData();  
 	    String s = new String(data, 0, receivePacket.getLength());
-	    //String[] splittedString = s.trim().split("\\s+");
-		//String reqResponse = splittedString[1];
+	    String[] splittedString = s.trim().split("\\s+");
+		String reqResponse = splittedString[1];
 
-		//if(reqResponse.equals("SER") || reqResponse.equals("SEROK"))
-			//System.out.println("Received at "+ System.nanoTime() + " from "+ receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
-		//else
+		if(reqResponse.equals("SER") || reqResponse.equals("SEROK"))
+			System.out.println("Received at "+ System.nanoTime() + " from "+ receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
+		else
 			System.out.println(receivePacket.getAddress().getHostAddress() + " : " + receivePacket.getPort() + " - " + s);
 
 	    return receivePacket;
