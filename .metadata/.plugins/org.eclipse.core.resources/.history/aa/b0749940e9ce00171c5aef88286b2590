@@ -21,7 +21,7 @@ public class ClientNode implements Runnable
 	public static ArrayList<String> alMatchingFileNameList = new ArrayList<String>();
 	
 	private static int g_iTimeStamp = 0;	// Logical time stamp
-	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>();	// Message list in the forum
+	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>();
 	
     DatagramSocket clientSocket;
     int listeningPort;
