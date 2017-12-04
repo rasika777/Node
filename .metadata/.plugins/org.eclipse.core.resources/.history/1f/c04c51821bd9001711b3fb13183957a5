@@ -1,3 +1,4 @@
+//TODO Update class with proper filelds and properties
 class Message
 {
 	private String ip;

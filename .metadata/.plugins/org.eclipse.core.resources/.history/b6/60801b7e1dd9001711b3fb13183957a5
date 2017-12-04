@@ -33,9 +33,7 @@ class ClientNode_ThreadNodeOperations implements Runnable
 			System.out.println("2: Display Connected Nodes");
 			System.out.println("3: Display Assigned Files");
 			System.out.println("4: Search a File");
-			System.out.println("5: Comment");
-			System.out.println("6: Display Forum");
-			System.out.println("7: Leave");
+			System.out.println("5: Leave");
 			System.out.println("0: Exit");
 			System.out.println("");
 		
@@ -72,15 +70,7 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					dcCommandHandling.fileSearchOption("\"" + sFileName + "\"");
 					break;
 				case 5:
-					System.out.println("5: Comment is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'
-					break;
-				case 6:
-					System.out.println("6: Display Forum is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'. Add clear screen before display too
-					break;
-				case 7:
-					System.out.println("6: Leave is selected");
+					System.out.println("5: Leave is selected");
 					dcCommandHandling.nodeLeave();
 					break;
 				default:

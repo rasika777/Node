@@ -77,7 +77,7 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					break;
 				case 6:
 					System.out.println("6: Display Forum is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'. Add clear screen before display too
+					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'
 					break;
 				case 7:
 					System.out.println("6: Leave is selected");

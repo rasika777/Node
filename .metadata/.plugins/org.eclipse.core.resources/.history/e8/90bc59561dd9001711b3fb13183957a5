@@ -229,8 +229,6 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					// TODO May need to recreate the comment message
-					
 					/* Create Message object */
 					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
 					

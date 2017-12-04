@@ -229,10 +229,8 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					// TODO May need to recreate the comment message
-					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
+					Message oMsg = new Message();
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
@@ -705,23 +703,13 @@ public class ClientNode implements Runnable
 		 * Description				: Check whether a comment is already in the node
 		 * Parameter <p_oMessage>	: Message to be checked, Message object
 		 * Return					: Availability of the comment in the node, boolean
-		 * Created					: 2017/12/04, Rasika Bandara
+		 * Created					: 2017/11/19, Rasika Bandara
 		 * Updates					: -
 		 */
 		private static boolean isAlreadyAvailableComment(Message p_oMessage)
 		{
 			// TODO Complete function
 			boolean bIsAlreadyAvailable = false;
-			
-			for (int i=0; i<g_oalMessageList.size(); i++)
-			{
-				if (g_oalMessageList.get(i).getIp() == p_oMessage.getIp()
-					&& g_oalMessageList.get(i).getTimestamp() == p_oMessage.getTimestamp())
-				{
-					bIsAlreadyAvailable = true;
-					break;
-				}
-			}
 			
 			return bIsAlreadyAvailable;
 		}

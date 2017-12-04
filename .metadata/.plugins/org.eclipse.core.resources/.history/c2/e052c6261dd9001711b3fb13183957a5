@@ -229,8 +229,6 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					// TODO May need to recreate the comment message
-					
 					/* Create Message object */
 					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
 					
@@ -705,7 +703,7 @@ public class ClientNode implements Runnable
 		 * Description				: Check whether a comment is already in the node
 		 * Parameter <p_oMessage>	: Message to be checked, Message object
 		 * Return					: Availability of the comment in the node, boolean
-		 * Created					: 2017/12/04, Rasika Bandara
+		 * Created					: 2017/11/19, Rasika Bandara
 		 * Updates					: -
 		 */
 		private static boolean isAlreadyAvailableComment(Message p_oMessage)

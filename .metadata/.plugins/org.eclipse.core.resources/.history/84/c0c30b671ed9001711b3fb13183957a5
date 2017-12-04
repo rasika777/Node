@@ -76,10 +76,6 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'
 					break;
 				case 6:
-					System.out.println("6: Display Forum is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'. Add clear screen before display too
-					break;
-				case 7:
 					System.out.println("6: Leave is selected");
 					dcCommandHandling.nodeLeave();
 					break;
