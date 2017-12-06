@@ -73,11 +73,14 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					break;
 				case 5:
 					System.out.println("5: Comment is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'
+					System.out.println("Enter comment message: ");
+					Scanner soReadCommentMsg = new Scanner(System.in);
+					String sCommentMsg = soReadCommentMsg.nextLine();
+					dcCommandHandling.comment("\"" + sCommentMsg + "\"");
 					break;
 				case 6:
 					System.out.println("6: Display Forum is selected");
-					//dcCommandHandling.nodeLeave(); TODO Add a suitable method to 'ClientNode.java'. Add clear screen before display too
+					dcCommandHandling.displayForum();
 					break;
 				case 7:
 					System.out.println("6: Leave is selected");

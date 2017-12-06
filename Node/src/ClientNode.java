@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -670,6 +671,73 @@ public class ClientNode implements Runnable
 			
 			return createMessage(salResponseMsg);
 		}
+		
+		/*
+		 * Method					: comment
+		 * Description				: Function to be executed when the user selected comment option
+		 * Parameter <p_sCommentMsg>: Comment message
+		 * Return					: None
+		 * Created					: 2017/12/06, Rasika Bandara
+		 * Updates					: -
+		 */
+		public void comment(String p_sCommentMsg)
+		{
+			g_iTimeStamp++;	// Increment logical time stamp by 1
+			
+			/* Add message to the forum in the current node */			
+			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
+			
+			g_oalMessageList.add(oMsg);
+			
+			/* Create comment message */
+			ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COM",
+				   																  IPAddress.getHostAddress(),
+				   																  Integer.toString(g_iTimeStamp),
+				   																  p_sCommentMsg));
+
+			String sCommentMsg = createMessage(salCommentMsg);
+			
+			/* Send message to the forums in the neighbors */
+			for(int j=0; j<neighbours.size(); j++)
+			{
+				try
+				{
+					sendPacket(clientSocket,sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+				}
+				catch (UnknownHostException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		/*
+		 * Method					: displayForum
+		 * Description				: Display the current forum in the order of the time stamp
+		 * Parameter <>				: None
+		 * Return					: None
+		 * Created					: 2017/12/06, Rasika Bandara
+		 * Updates					: -
+		 */
+		public void displayForum()
+		{
+			// TODO Add clear screen before displaying the forum
+			
+			// TODO Test data: remove
+			/* Add message to the forum in the current node */			
+			Message oMsg1 = new Message(IPAddress.getHostAddress(), 15, "third msg");
+			Message oMsg2 = new Message(IPAddress.getHostAddress(), 9, "second msg");
+			Message oMsg3 = new Message(IPAddress.getHostAddress(), 19, "final msg");
+			Message oMsg4 = new Message(IPAddress.getHostAddress(), 3, "first msg");			
+			g_oalMessageList.add(oMsg1);
+			g_oalMessageList.add(oMsg2);
+			g_oalMessageList.add(oMsg3);
+			g_oalMessageList.add(oMsg4);
+			
+			Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);
+			
+			// TODO Complete this function
+		}
 
 		/*
 		 * Method					: createMessage
@@ -710,7 +778,6 @@ public class ClientNode implements Runnable
 		 */
 		private static boolean isAlreadyAvailableComment(Message p_oMessage)
 		{
-			// TODO Complete function
 			boolean bIsAlreadyAvailable = false;
 			
 			for (int i=0; i<g_oalMessageList.size(); i++)

@@ -21,7 +21,7 @@ public class ClientNode implements Runnable
 	public static ArrayList<String> alMatchingFileNameList = new ArrayList<String>();
 	
 	private static int g_iTimeStamp = 0;	// Logical time stamp
-	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>();
+	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>();	// Message list in the forum
 	
     DatagramSocket clientSocket;
     int listeningPort;
@@ -229,8 +229,10 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
+					// TODO May need to recreate the comment message
+					
 					/* Create Message object */
-					Message oMsg = new Message();
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
@@ -668,6 +670,44 @@ public class ClientNode implements Runnable
 			
 			return createMessage(salResponseMsg);
 		}
+		
+		/*
+		 * Method					: comment
+		 * Description				: Function to be executed when the user selected comment option
+		 * Parameter <p_sCommentMsg>: Comment message
+		 * Return					: None
+		 * Created					: 2017/12/06, Rasika Bandara
+		 * Updates					: -
+		 */
+		public void comment(String p_sCommentMsg)
+		{
+			// TODO Complete the function
+			g_iTimeStamp++;	// Increment logical time stamp by 1
+			
+			/* Add message to the forum in the current node */			
+			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
+			
+			g_oalMessageList.add(oMsg);
+			
+			/* Create comment message */
+			ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COM",
+				   																  IPAddress.getHostAddress(),
+				   																  Integer.toString(g_iTimeStamp),
+				   																  p_sCommentMsg));
+
+
+			String sSearchMsg = createMessage(salSearchMsg);
+			
+			/* Send message to the forums in the other nodes */
+			try
+			{
+				sendPacket(clientSocket,sSearchMsg.getBytes(), sSearchMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+			}
+			catch (UnknownHostException e)
+			{
+				e.printStackTrace();
+			}
+		}
 
 		/*
 		 * Method					: createMessage
@@ -703,13 +743,22 @@ public class ClientNode implements Runnable
 		 * Description				: Check whether a comment is already in the node
 		 * Parameter <p_oMessage>	: Message to be checked, Message object
 		 * Return					: Availability of the comment in the node, boolean
-		 * Created					: 2017/11/19, Rasika Bandara
+		 * Created					: 2017/12/04, Rasika Bandara
 		 * Updates					: -
 		 */
 		private static boolean isAlreadyAvailableComment(Message p_oMessage)
 		{
-			// TODO Complete function
 			boolean bIsAlreadyAvailable = false;
+			
+			for (int i=0; i<g_oalMessageList.size(); i++)
+			{
+				if (g_oalMessageList.get(i).getIp() == p_oMessage.getIp()
+					&& g_oalMessageList.get(i).getTimestamp() == p_oMessage.getTimestamp())
+				{
+					bIsAlreadyAvailable = true;
+					break;
+				}
+			}
 			
 			return bIsAlreadyAvailable;
 		}

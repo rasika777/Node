@@ -1,3 +1,5 @@
+import java.util.Comparator;
+
 class Message
 {
 	private String ip;
@@ -25,4 +27,13 @@ class Message
 	{
 		return this.comment;
 	}
+	
+	/* Sort messages by time stamp */
+	public static Comparator<Message> COMPARE_BY_TIMESTAMP = new Comparator<Message>()
+	{
+		public int compare(Message one, Message other)
+		{
+			return Integer.compare(one.timestamp, other.timestamp);
+		}
+	};
 }
