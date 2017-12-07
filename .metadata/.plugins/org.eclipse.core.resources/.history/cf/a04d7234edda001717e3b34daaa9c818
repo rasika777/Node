@@ -230,25 +230,16 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					/* Create the comment message */
-					String sCommentMsg = "";
-					for (int i=4; i<st.length; i++)
-					{
-						sCommentMsg += st[i] + " ";
-					}
-					sCommentMsg.trim();
+					// TODO May need to recreate the comment message
 					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, sCommentMsg);
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
 					{
 						g_oalMessageList.add(oMsg);
 					}
-					
-					// TODO Forward comment message to other nodes
-					// TODO Add hop count
 				}
 			}
 			catch (IOException e)
@@ -803,8 +794,28 @@ public class ClientNode implements Runnable
 		 * Updates					: -
 		 */
 		private final static void clearConsole()
-		{		
-			System.out.print("\033[H\033[2J");
-			System.out.flush();
+		{
+			/*try
+			{
+				final String sOS = System.getProperty("os.name");
+				
+				if (sOS.contains("Windows"))
+				{
+					Runtime.getRuntime().exec("cls");
+				}
+				else
+				{
+					Runtime.getRuntime().exec("clear");
+				}
+			}
+			catch (final Exception e)
+			{
+				
+			}*/
+			
+			for (int i=0; i<200; i++)
+			{
+				System.out.println();
+			}
 		}
 }

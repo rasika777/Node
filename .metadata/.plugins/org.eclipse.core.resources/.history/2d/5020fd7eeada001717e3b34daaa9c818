@@ -230,25 +230,16 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					/* Create the comment message */
-					String sCommentMsg = "";
-					for (int i=4; i<st.length; i++)
-					{
-						sCommentMsg += st[i] + " ";
-					}
-					sCommentMsg.trim();
+					// TODO May need to recreate the comment message
 					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, sCommentMsg);
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, st[4]);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
 					{
 						g_oalMessageList.add(oMsg);
 					}
-					
-					// TODO Forward comment message to other nodes
-					// TODO Add hop count
 				}
 			}
 			catch (IOException e)
@@ -730,7 +721,18 @@ public class ClientNode implements Runnable
 		 */
 		public void displayForum()
 		{
-			clearConsole();
+			// TODO Add clear screen before displaying the forum
+			
+			// TODO Test data: remove
+			/* Add message to the forum in the current node */			
+			/*Message oMsg1 = new Message(IPAddress.getHostAddress(), 15, "third msg");
+			Message oMsg2 = new Message(IPAddress.getHostAddress(), 9, "second msg");
+			Message oMsg3 = new Message(IPAddress.getHostAddress(), 19, "final msg");
+			Message oMsg4 = new Message(IPAddress.getHostAddress(), 3, "first msg");			
+			g_oalMessageList.add(oMsg1);
+			g_oalMessageList.add(oMsg2);
+			g_oalMessageList.add(oMsg3);
+			g_oalMessageList.add(oMsg4);*/
 			
 			Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);
 			
@@ -792,19 +794,5 @@ public class ClientNode implements Runnable
 			}
 			
 			return bIsAlreadyAvailable;
-		}
-		
-		/*
-		 * Method					: clearConsole
-		 * Description				: Clear console for Windows and Linux
-		 * Parameter <>				: -
-		 * Return					: -
-		 * Created					: 2017/12/07, Rasika Bandara
-		 * Updates					: -
-		 */
-		private final static void clearConsole()
-		{		
-			System.out.print("\033[H\033[2J");
-			System.out.flush();
 		}
 }

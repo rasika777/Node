@@ -236,7 +236,6 @@ public class ClientNode implements Runnable
 					{
 						sCommentMsg += st[i] + " ";
 					}
-					sCommentMsg.trim();
 					
 					/* Create Message object */
 					Message oMsg = new Message(st[2], iTimeStampFromMessage, sCommentMsg);
@@ -246,9 +245,6 @@ public class ClientNode implements Runnable
 					{
 						g_oalMessageList.add(oMsg);
 					}
-					
-					// TODO Forward comment message to other nodes
-					// TODO Add hop count
 				}
 			}
 			catch (IOException e)

@@ -230,13 +230,13 @@ public class ClientNode implements Runnable
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
+					// TODO May need to recreate the comment message
 					/* Create the comment message */
 					String sCommentMsg = "";
 					for (int i=4; i<st.length; i++)
 					{
-						sCommentMsg += st[i] + " ";
+						sCommentMsg += st[i];
 					}
-					sCommentMsg.trim();
 					
 					/* Create Message object */
 					Message oMsg = new Message(st[2], iTimeStampFromMessage, sCommentMsg);
@@ -246,9 +246,6 @@ public class ClientNode implements Runnable
 					{
 						g_oalMessageList.add(oMsg);
 					}
-					
-					// TODO Forward comment message to other nodes
-					// TODO Add hop count
 				}
 			}
 			catch (IOException e)
