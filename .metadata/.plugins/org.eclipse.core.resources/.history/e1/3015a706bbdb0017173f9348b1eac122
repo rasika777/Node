@@ -799,7 +799,12 @@ public class ClientNode implements Runnable
 			boolean bIsAlreadyAvailable = false;
 					
 			for (int i=0; i<g_oalMessageList.size(); i++)
-			{			
+			{
+				String ip1 = g_oalMessageList.get(i).getIp();
+				String ip2 = p_oMessage.getIp();
+				int ts1 = g_oalMessageList.get(i).getTimestamp();
+				int ts2 = p_oMessage.getTimestamp();
+				
 				if (g_oalMessageList.get(i).getIp().equals(p_oMessage.getIp())
 					&& g_oalMessageList.get(i).getTimestamp() == p_oMessage.getTimestamp())
 				{

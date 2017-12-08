@@ -231,15 +231,15 @@ public class ClientNode implements Runnable
 					}
 					
 					/* Create the comment message */
-					String sComment = "";
+					String sCommentMsg = "";
 					for (int i=5; i<st.length; i++)
 					{
-						sComment += st[i] + " ";
+						sCommentMsg += st[i] + " ";
 					}
-					sComment.trim();
+					sCommentMsg.trim();
 					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, sComment);
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, sCommentMsg);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
@@ -259,9 +259,9 @@ public class ClientNode implements Runnable
 									  												IPAddress.getHostAddress(),
 									  												Integer.toString(g_iTimeStamp),
 									  												Integer.toString(iHopCount),
-									  												sComment));
-							String sCommentMsg = createMessage(salCommentMsg);
-							sendPacket(clientSocket, sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+									  												sCommentMsg));
+						String sSearchMsg = createMessage(salSearchMsg);
+						sendPacket(clientSocket, sSearchMsg.getBytes(), sSearchMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
 						}
 					}
 				}
@@ -797,13 +797,12 @@ public class ClientNode implements Runnable
 		private static boolean isAlreadyAvailableComment(Message p_oMessage)
 		{
 			boolean bIsAlreadyAvailable = false;
-					
+			
 			for (int i=0; i<g_oalMessageList.size(); i++)
-			{			
-				if (g_oalMessageList.get(i).getIp().equals(p_oMessage.getIp())
+			{
+				if (g_oalMessageList.get(i).getIp() == p_oMessage.getIp()
 					&& g_oalMessageList.get(i).getTimestamp() == p_oMessage.getTimestamp())
 				{
-					
 					bIsAlreadyAvailable = true;
 					break;
 				}
