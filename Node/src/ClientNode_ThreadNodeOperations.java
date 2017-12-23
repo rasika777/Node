@@ -34,9 +34,10 @@ class ClientNode_ThreadNodeOperations implements Runnable
 			System.out.println("3: Display Assigned Files");
 			System.out.println("4: Search a File");
 			System.out.println("5: Comment");
-			System.out.println("6: Comment Reply");
-			System.out.println("7: Display Forum");
-			System.out.println("8: Leave");
+			System.out.println("6: Rank a Comment");			
+			System.out.println("7: Rank a File");
+			System.out.println("8: Display Forum");
+			System.out.println("9: Leave");
 			System.out.println("0: Exit");
 			System.out.println("");
 		
@@ -80,24 +81,46 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					dcCommandHandling.comment("\"" + sCommentMsg + "\"");
 					break;
 				case 6:
-					System.out.println("6: Comment Reply is selected");
-					// Getting input on which message to reply
-					System.out.println("Enter to which message you are going to reply: ");
-					Scanner soReadCommentToReply = new Scanner(System.in);
-					int sCommentMsgToReply = soReadCommentToReply.nextInt();
-					
-					System.out.println("Enter the reply: ");
-					Scanner soReadReplyMsg = new Scanner(System.in);
-					String sReplyMsg = soReadReplyMsg.nextLine();					
-					
-					dcCommandHandling.commentReply("\"" + sReplyMsg + "\"", sCommentMsgToReply);
+                                        System.out.println("6: Rank a Comment is selected");
+					System.out.println("Enter Comment sent IP: ");
+                                        Scanner ipSent = new Scanner(System.in);
+
+					System.out.println("Enter ID : ");
+					Scanner commentId = new Scanner(System.in);
+                                        
+                                        System.out.println("Enter Rank : ");
+                                        Scanner rank = new Scanner(System.in);
+                                        
+                                        
+					String ipGiven = ipSent.nextLine();
+                                        String idGiven = commentId.nextLine();
+                                        
+  
+					String rankGiven = rank.nextLine();
+					int rankValue = Integer.parseInt(rankGiven);
+                                        
+                                        String key = ipGiven+":"+idGiven;
+                                                
+			
+					dcCommandHandling.rank(key,rankValue, 2);
 					break;
 				case 7:
-					System.out.println("7: Display Forum is selected");
-					dcCommandHandling.displayForum();
+					System.out.println("7: Rank a File is selected");
+					System.out.println("Enter File Name to Rank: ");
+					Scanner fileNameGivenSc = new Scanner(System.in);
+					String fileNameGiven = fileNameGivenSc.nextLine();
+					System.out.println("Enter Rank : ");
+					Scanner rankGivenSc = new Scanner(System.in);
+					String fileRankGiven = rankGivenSc.nextLine();
+					int filRankValue = Integer.parseInt(fileRankGiven);
+					dcCommandHandling.rank(fileNameGiven,filRankValue, 1);
 					break;
 				case 8:
-					System.out.println("8: Leave is selected");
+					System.out.println("8: Display Forum is selected");
+					dcCommandHandling.displayForum();
+					break;
+				case 9:
+					System.out.println("9: Leave is selected");
 					dcCommandHandling.nodeLeave();
 					break;
 				default:

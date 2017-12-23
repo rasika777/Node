@@ -1,3 +1,4 @@
+import src.Rank;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,9 +22,12 @@ public class ClientNode implements Runnable
 	static int[] g_saConnectedPorts = new int[2];			// Ports of the neighbor nodes
 	static String[] g_saContainingFiles = new String[5];	// File names of the containing files in the node
 	public static ArrayList<String> alMatchingFileNameList = new ArrayList<String>();
+	public Dictionary<String,List<Object>> rankByFileNameDictionary = null;
 	
 	private static int g_iTimeStamp = 0;	// Logical time stamp
 	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>();	// Message list in the forum
+	private static ArrayList<Rank> rankList = new ArrayList<Rank>();// Rank list - Files
+        private static ArrayList<Rank>  comRankList = new ArrayList<>(); //Rank list - comment
 	
     DatagramSocket clientSocket;
     int listeningPort;
@@ -239,7 +244,7 @@ public class ClientNode implements Runnable
 					sComment.trim();
 					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, sComment, null);
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, sComment);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
@@ -256,8 +261,8 @@ public class ClientNode implements Runnable
 						   && iHopCount < 11)
 						{
 							ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COM",
-									  												st[2],
-									  												st[3],
+									  												IPAddress.getHostAddress(),
+									  												Integer.toString(g_iTimeStamp),
 									  												Integer.toString(iHopCount),
 									  												sComment));
 							String sCommentMsg = createMessage(salCommentMsg);
@@ -265,65 +270,95 @@ public class ClientNode implements Runnable
 						}
 					}
 				}
-				// reply message
-				else if(reqResponse.equals("COMRPL"))
+				else if(reqResponse.equals("RANK"))
 				{
 					/* Update logical time stamp */
-					int iTimeStampFromMessage = Integer.parseInt(st[3]);
+					int iTimeStampFromMessage = Integer.parseInt(st[4]);
+					
 					if(g_iTimeStamp < iTimeStampFromMessage)
 					{
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 					
-					/* Create the reply message */
-					String sComment = "";
-					for (int i=7; i<st.length; i++)
-					{
-						sComment += st[i] + " ";
-					}
-					sComment.trim();
+                                        
+					String mode = st[1];
+					String rankVal = st[st.length-1];
+                                        
+                                        if(mode.equals("F"))
+                                        {
+                                        
 					
-					String initCommentIP = st[4];
-					String initCommentTimestamp = st[5];
-										
-					
-					for(int j=0; j<g_oalMessageList.size(); j++)
+					/* Create the rank message */
+					String fileName = "";
+					for (int i=6; i<st.length-1; i++)
 					{
-						if(g_oalMessageList.get(j).getIp() == initCommentIP && g_oalMessageList.get(j).getTimestamp() == Integer.parseInt(initCommentTimestamp))
-						{
-							Reply commentReply = new Reply(st[2], iTimeStampFromMessage, sComment);
-							g_oalMessageList.get(j).setReplies(commentReply);
-						}
+						fileName += st[i] + " ";
 					}
+					fileName.trim();
+					
+					System.out.println("Rank file Name recieved ->" + fileName);
+					System.out.println("rank" + rankVal);
+					
+					/* Create Rank object */
+					Rank rankMsg = new Rank(st[3], iTimeStampFromMessage, Integer.parseInt(rankVal), fileName, 1);
+					
+					/* Add rank to rank list */
+					if(!isAlreadyAvailableRank(rankMsg))
+					{
+						this.rankList.add(rankMsg);
+					
+
 					
 				
-					/* Forward reply message to other nodes */			
-					int iHopCount = Integer.parseInt(st[6]) + 1;	// Increment hop count
+					/* Forward rank message to other nodes 		*/
+					int iHopCount = Integer.parseInt(st[4]) + 1;	// Increment hop count
 					for(int j=0; j<neighbours.size(); j++)
 					{
 						if(neighbours.get(j).getIp() != incomingPacket.getAddress().getHostAddress()
 						   && iHopCount < 11)
 						{
-							ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COMRPL",
-									  												st[2],
-									  												st[3],
-									  												st[4],
-									  												st[5],
-									  												Integer.toString(iHopCount),
-									  												sComment));
-
 							
+							ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("RANK",
+                                                                                                                            "F",
+                                                                                                                            IPAddress.getHostAddress(),
+                                                                                                                            Integer.toString(g_iTimeStamp),
+                                                                                                                            Integer.toString(iHopCount),
+                                                                                                                            fileName,
+                                                                                                                            rankVal));
 							String sCommentMsg = createMessage(salCommentMsg);
 							sendPacket(clientSocket, sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
 						}
 					}
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
+                                    }
+                                }
+                            else
+                                {
+                                    if(comRankList != null){
+                                        
+                                        String nodeKey;
+                                        for(int i=0; i<comRankList.size();i++){
+                                          Rank comRank = comRankList.get(i);
+                                          
+                                          if(comRank != null){
+                                              String myKey = comRank.getIp()+"-"+comRank.getTimestamp();
+                                              
+                                              //if(myKey.equals(nodeKey))
+                                              //{
+                                                  
+                                              //}
+                                          }
+                                        }
+                                    }
+                                    // once found th e
+                                }
+				
+                            }
+                    }
+                    catch (IOException e)
+                    {
+                            e.printStackTrace();
+                    }
+            }
     }
 	  
 	// Send datagram packet
@@ -653,12 +688,60 @@ public class ClientNode implements Runnable
 		  else
 		  {
 			  System.out.println(alMatchingFileNameList.size()+" File found at: "+ System.nanoTime());
+			  
 			  for(int i=0; i<alMatchingFileNameList.size(); i++)
 			  {
-			  System.out.println(i+1+". "+alMatchingFileNameList.get(i));
+				  System.out.println(i+1+". "+alMatchingFileNameList.get(i));
 			  }
 		  }
 	  }
+	  
+	  public boolean IsFileNameFound(String fileName)
+	  {
+		  int iAssignedFileNamesCounter = 0;
+			
+			for (int i=0; i<g_saContainingFiles.length; i++)
+			{
+				if (g_saContainingFiles[i] != null)
+				{
+					iAssignedFileNamesCounter++;
+				}
+			}
+			
+					
+			for (int i=0; i<iAssignedFileNamesCounter; i++)
+			{
+				if (g_saContainingFiles[i] != null && g_saContainingFiles[i].equals(fileName))
+				{
+					return true;
+				}
+			}
+			
+			return false;
+	  }
+          
+          public boolean IsCommentFound(String key){
+			
+              boolean result = false;
+              
+              for (int i = 0 ; i < g_oalMessageList.size() ; i++ )
+              {
+                   Message msg = g_oalMessageList.get(i);
+                   String myKey;
+                   
+                   if(msg != null)
+                   {
+                       myKey = msg.getIp()+":"+msg.getTimestamp();
+                       
+                       if(myKey.equals(key)){
+                           result = true;
+                           break;
+                       }
+                   }
+              }
+              
+              return result;
+          }
 		
 		/*
 		 * Method								: searchFile
@@ -762,7 +845,7 @@ public class ClientNode implements Runnable
 			g_iTimeStamp++;	// Increment logical time stamp by 1
 			
 			/* Add message to the forum in the current node */			
-			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg, null);
+			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
 			
 			g_oalMessageList.add(oMsg);
 			
@@ -789,42 +872,99 @@ public class ClientNode implements Runnable
 				}
 			}
 		}
+	
 		
-		public void commentReply(String p_sCommentMsg, int initCommentIndex)
+		/*
+		 * Method					: Rank
+		 * Description				: Rank files and Comments
+		 * Parameter <>				: filename , rank , <1=File, 2=Comment>
+		 * Return					: None
+		 * Created					: 2017/12/08, Tharindu Kumarapperuma
+		 * Updates					: -
+		 */
+		public void rank(String key, int rank, int option)
 		{
-			g_iTimeStamp++;	// Increment logical time stamp by 1
-			
-			/* Add comment reply to the forum in the current node */	
-			Message initComment = g_oalMessageList.get(initCommentIndex - 1);
-			Reply repMsg = new Reply(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
-			initComment.setReplies(repMsg);
-						
-			/* Create reply message */
-			int iHopCount = 0;
-			ArrayList<String> salReplyMsg = new ArrayList<String>(Arrays.asList("COMRPL",
-				   																  IPAddress.getHostAddress(),
-				   																  Integer.toString(g_iTimeStamp),
-				   																  initComment.getIp(),
-				   																  Integer.toString(initComment.getTimestamp()),
-				   																  Integer.toString(iHopCount),
-				   																  p_sCommentMsg));
+			if(option == 1){
+				// for rank files
+				g_iTimeStamp++;	// Increment logical time stamp by 1
+				
+				/* Add rank to the forum in the current node */			
+				Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, rank, key, option);
+				
+				// check file name contins or not, add only if contains
+				if(IsFileNameFound(key))
+				{
+					rankList.add(oMsg);
+				}
+				
+				/* Create rank message */
+				int iHopCount = 0;
+				ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList("RANK",
+                                                                                "F",
+                                                                                IPAddress.getHostAddress(),
+                                                                                Integer.toString(g_iTimeStamp),
+                                                                                Integer.toString(iHopCount),
+                                                                                key.trim(),
+                                                                                Integer.toString(rank)));
 
-			String sReplyMsg = createMessage(salReplyMsg);
-			
-			/* Send reply to the forums in the neighbors */
-			for(int j=0; j<neighbours.size(); j++)
-			{
-				try
+				String sCommentMsg = createMessage(rankMsg);
+				
+				/* Send rank to the neighbors */
+				for(int j=0; j<neighbours.size(); j++)
 				{
-					sendPacket(clientSocket,sReplyMsg.getBytes(), sReplyMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+					try
+					{
+						sendPacket(clientSocket,sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+					}
+					catch (UnknownHostException e)
+					{
+						e.printStackTrace();
+					}
 				}
-				catch (UnknownHostException e)
+				
+			}
+			else if (option == 2){
+				// for rank comments
+                                
+                                // for rank files
+				g_iTimeStamp++;	// Increment logical time stamp by 1
+				
+				/* Add rank to the forum in the current node */			
+				Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, rank, key, option);
+				
+				// check file name contins or not, add only if contains
+				if(IsCommentFound(key))
 				{
-					e.printStackTrace();
+					comRankList.add(oMsg);
 				}
+				
+				/* Create rank message */
+				int iHopCount = 0;
+				ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList("RANK",
+                                                                                "C",
+                                                                                IPAddress.getHostAddress(),
+                                                                                Integer.toString(g_iTimeStamp),
+                                                                                Integer.toString(iHopCount),
+                                                                                key.trim(),
+                                                                                Integer.toString(rank)));
+
+				String sCommentMsg = createMessage(rankMsg);
+				
+				/* Send rank to the neighbors */
+				for(int j=0; j<neighbours.size(); j++)
+				{
+					try
+					{
+						sendPacket(clientSocket,sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+					}
+					catch (UnknownHostException e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
 			}
 		}
-		
 		/*
 		 * Method					: displayForum
 		 * Description				: Display the current forum in the order of the time stamp
@@ -837,16 +977,21 @@ public class ClientNode implements Runnable
 		{
 			clearConsole();
 			
-			Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);
+			Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);			
+			Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
 			
+                        System.out.println("################## COMMENTS ################");
 			for(int i=0; i<g_oalMessageList.size(); i++)
 			{
 				System.out.println(g_oalMessageList.get(i).getComment() + " (By: " + g_oalMessageList.get(i).getIp() + ", At: " + g_oalMessageList.get(i).getTimestamp() + ")");
-				for(int j=0; j<g_oalMessageList.get(i).getReplies().size(); j++)
-				{
-					
-					System.out.println("\t"+"- "+g_oalMessageList.get(i).getReplies().get(j).getReply() + " (By: " + g_oalMessageList.get(i).getReplies().get(j).getIp() + ", At: " + g_oalMessageList.get(i).getReplies().get(j).getTimestamp() + ")");
-				}
+			}
+                        
+			System.out.println("");
+                        System.out.println("################## FILES RANKS ################");
+			for(int i=0; i<rankList.size(); i++)
+			{
+				System.out.println(rankList.get(i).GetFileName() + " (Rank : "+ rankList.get(i).getValue() +" Ranked By: " + rankList.get(i).getIp() + ", At: " + rankList.get(i).getTimestamp() + ")");
+
 			}
 		}
 
@@ -887,14 +1032,14 @@ public class ClientNode implements Runnable
 		 * Created					: 2017/12/04, Rasika Bandara
 		 * Updates					: -
 		 */
-		private static boolean isAlreadyAvailableComment(Message p_oMessage)
+		private static boolean isAlreadyAvailableComment(Message rankMsg)
 		{
 			boolean bIsAlreadyAvailable = false;
 					
 			for (int i=0; i<g_oalMessageList.size(); i++)
 			{			
-				if (g_oalMessageList.get(i).getIp().equals(p_oMessage.getIp())
-					&& g_oalMessageList.get(i).getTimestamp() == p_oMessage.getTimestamp())
+				if (g_oalMessageList.get(i).getIp().equals(rankMsg.getIp())
+					&& g_oalMessageList.get(i).getTimestamp() == rankMsg.getTimestamp())
 				{
 					
 					bIsAlreadyAvailable = true;
@@ -903,6 +1048,42 @@ public class ClientNode implements Runnable
 			}
 			
 			return bIsAlreadyAvailable;
+		}
+		
+		private static boolean isAlreadyAvailableRank(Rank rank)
+		{
+			boolean isAvailable = false;
+			
+			for(int i =0; i < rankList.size();i++)
+			{
+				Rank r1 = rankList.get(i);
+				
+				if(rank.GetMode() ==1) // File rank
+				{
+					if (rankList.get(i).GetFileName().equals(rank.GetFileName()) && rankList.get(i).getIp().equals(rank.getIp())
+							&& rankList.get(i).getTimestamp() == rank.getTimestamp())
+						{
+							
+							isAvailable = true;
+							break;
+						}
+				}
+				else
+				{
+					//Comment Rank
+					if (rankList.get(i).getIp().equals(rank.getIp())
+							&& rankList.get(i).getTimestamp() == rank.getTimestamp())
+						{
+							
+							isAvailable = true;
+							break;
+						}
+				}
+				
+				
+			}
+			
+			return isAvailable;
 		}
 		
 		/*
