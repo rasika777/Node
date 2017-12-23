@@ -239,7 +239,7 @@ public class ClientNode implements Runnable
 					sComment.trim();
 					
 					/* Create Message object */
-					Message oMsg = new Message(st[2], iTimeStampFromMessage, sComment);
+					Message oMsg = new Message(st[2], iTimeStampFromMessage, sComment, null);
 					
 					/* Add message to message list */
 					if(!isAlreadyAvailableComment(oMsg))
@@ -256,10 +256,63 @@ public class ClientNode implements Runnable
 						   && iHopCount < 11)
 						{
 							ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COM",
-									  												IPAddress.getHostAddress(),
-									  												Integer.toString(g_iTimeStamp),
+									  												st[2],
+									  												st[3],
 									  												Integer.toString(iHopCount),
 									  												sComment));
+							String sCommentMsg = createMessage(salCommentMsg);
+							sendPacket(clientSocket, sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+						}
+					}
+				}
+				// reply message
+				else if(reqResponse.equals("COMRPL"))
+				{
+					/* Update logical time stamp */
+					int iTimeStampFromMessage = Integer.parseInt(st[3]);
+					if(g_iTimeStamp < iTimeStampFromMessage)
+					{
+						g_iTimeStamp = iTimeStampFromMessage;
+					}
+					
+					/* Create the reply message */
+					String sComment = "";
+					for (int i=7; i<st.length; i++)
+					{
+						sComment += st[i] + " ";
+					}
+					sComment.trim();
+					
+					String initCommentIP = st[4];
+					String initCommentTimestamp = st[5];
+										
+					
+					for(int j=0; j<g_oalMessageList.size(); j++)
+					{
+						if(g_oalMessageList.get(j).getIp() == initCommentIP && g_oalMessageList.get(j).getTimestamp() == Integer.parseInt(initCommentTimestamp))
+						{
+							Reply commentReply = new Reply(st[2], iTimeStampFromMessage, sComment);
+							g_oalMessageList.get(j).setReplies(commentReply);
+						}
+					}
+					
+				
+					/* Forward reply message to other nodes */			
+					int iHopCount = Integer.parseInt(st[6]) + 1;	// Increment hop count
+					for(int j=0; j<neighbours.size(); j++)
+					{
+						if(neighbours.get(j).getIp() != incomingPacket.getAddress().getHostAddress()
+						   && iHopCount < 11)
+						{
+							ArrayList<String> salCommentMsg = new ArrayList<String>(Arrays.asList("COMRPL",
+									  												st[2],
+									  												st[3],
+									  												st[4],
+									  												st[5],
+									  												Integer.toString(iHopCount),
+									  												sComment));
+
+							
 							String sCommentMsg = createMessage(salCommentMsg);
 							sendPacket(clientSocket, sCommentMsg.getBytes(), sCommentMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
 						}
@@ -709,7 +762,7 @@ public class ClientNode implements Runnable
 			g_iTimeStamp++;	// Increment logical time stamp by 1
 			
 			/* Add message to the forum in the current node */			
-			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
+			Message oMsg = new Message(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg, null);
 			
 			g_oalMessageList.add(oMsg);
 			
@@ -737,6 +790,41 @@ public class ClientNode implements Runnable
 			}
 		}
 		
+		public void commentReply(String p_sCommentMsg, int initCommentIndex)
+		{
+			g_iTimeStamp++;	// Increment logical time stamp by 1
+			
+			/* Add comment reply to the forum in the current node */	
+			Message initComment = g_oalMessageList.get(initCommentIndex - 1);
+			Reply repMsg = new Reply(IPAddress.getHostAddress(), g_iTimeStamp, p_sCommentMsg);
+			initComment.setReplies(repMsg);
+						
+			/* Create reply message */
+			int iHopCount = 0;
+			ArrayList<String> salReplyMsg = new ArrayList<String>(Arrays.asList("COMRPL",
+				   																  IPAddress.getHostAddress(),
+				   																  Integer.toString(g_iTimeStamp),
+				   																  initComment.getIp(),
+				   																  Integer.toString(initComment.getTimestamp()),
+				   																  Integer.toString(iHopCount),
+				   																  p_sCommentMsg));
+
+			String sReplyMsg = createMessage(salReplyMsg);
+			
+			/* Send reply to the forums in the neighbors */
+			for(int j=0; j<neighbours.size(); j++)
+			{
+				try
+				{
+					sendPacket(clientSocket,sReplyMsg.getBytes(), sReplyMsg.length(), InetAddress.getByName(neighbours.get(j).getIp()), neighbours.get(j).getPort());
+				}
+				catch (UnknownHostException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		/*
 		 * Method					: displayForum
 		 * Description				: Display the current forum in the order of the time stamp
@@ -754,6 +842,11 @@ public class ClientNode implements Runnable
 			for(int i=0; i<g_oalMessageList.size(); i++)
 			{
 				System.out.println(g_oalMessageList.get(i).getComment() + " (By: " + g_oalMessageList.get(i).getIp() + ", At: " + g_oalMessageList.get(i).getTimestamp() + ")");
+				for(int j=0; j<g_oalMessageList.get(i).getReplies().size(); j++)
+				{
+					
+					System.out.println("\t"+"- "+g_oalMessageList.get(i).getReplies().get(j).getReply() + " (By: " + g_oalMessageList.get(i).getReplies().get(j).getIp() + ", At: " + g_oalMessageList.get(i).getReplies().get(j).getTimestamp() + ")");
+				}
 			}
 		}
 

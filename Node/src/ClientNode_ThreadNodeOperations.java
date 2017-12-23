@@ -34,8 +34,9 @@ class ClientNode_ThreadNodeOperations implements Runnable
 			System.out.println("3: Display Assigned Files");
 			System.out.println("4: Search a File");
 			System.out.println("5: Comment");
-			System.out.println("6: Display Forum");
-			System.out.println("7: Leave");
+			System.out.println("6: Comment Reply");
+			System.out.println("7: Display Forum");
+			System.out.println("8: Leave");
 			System.out.println("0: Exit");
 			System.out.println("");
 		
@@ -79,11 +80,24 @@ class ClientNode_ThreadNodeOperations implements Runnable
 					dcCommandHandling.comment("\"" + sCommentMsg + "\"");
 					break;
 				case 6:
-					System.out.println("6: Display Forum is selected");
-					dcCommandHandling.displayForum();
+					System.out.println("6: Comment Reply is selected");
+					// Getting input on which message to reply
+					System.out.println("Enter to which message you are going to reply: ");
+					Scanner soReadCommentToReply = new Scanner(System.in);
+					int sCommentMsgToReply = soReadCommentToReply.nextInt();
+					
+					System.out.println("Enter the reply: ");
+					Scanner soReadReplyMsg = new Scanner(System.in);
+					String sReplyMsg = soReadReplyMsg.nextLine();					
+					
+					dcCommandHandling.commentReply("\"" + sReplyMsg + "\"", sCommentMsgToReply);
 					break;
 				case 7:
-					System.out.println("6: Leave is selected");
+					System.out.println("7: Display Forum is selected");
+					dcCommandHandling.displayForum();
+					break;
+				case 8:
+					System.out.println("8: Leave is selected");
 					dcCommandHandling.nodeLeave();
 					break;
 				default:
