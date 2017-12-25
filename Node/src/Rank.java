@@ -1,4 +1,3 @@
-package src;
 
 import java.util.Comparator;
 
@@ -49,6 +48,10 @@ public int getValue()
 
 public String GetFileName(){
 	return this.fileName;
+}
+
+public String GetCommentId(){
+	return this.commentId;
 }
 
 public int GetMode(){
