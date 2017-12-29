@@ -995,7 +995,7 @@ public class ClientNode implements Runnable {
 		Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);
 
 		for (int i = 0; i < g_oalMessageList.size(); i++) {
-			System.out.println(String.format("%02d", i+1) + ". " + g_oalMessageList.get(i).getComment() + " (By: "
+			System.out.println(String.format("%02d", i) + ". " + g_oalMessageList.get(i).getComment() + " (By: "
 					+ g_oalMessageList.get(i).getIp() + ", At: "
 					+ g_oalMessageList.get(i).getTimestamp() + ")");
 			for (int j = 0; j < g_oalMessageList.get(i).getReplies().size(); j++) {
@@ -1144,19 +1144,7 @@ public class ClientNode implements Runnable {
 	 * : -
 	 */
 	private final static void clearConsole() {
-		final String os = System.getProperty("os.name");
-		
-		if (os.contains("Windows"))
-		{
-			for(int clear = 0; clear < 50; clear++)
-			{
-				System.out.println("\b");
-			}
-		}
-		else if (os.contains("Linux"))
-		{
-			System.out.print("\033[H\033[2J");
-			System.out.flush();
-		}
+		System.out.print("\033[H\033[2J");
+		System.out.flush();
 	}
 }

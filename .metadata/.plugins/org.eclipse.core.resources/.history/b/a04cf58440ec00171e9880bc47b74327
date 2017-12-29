@@ -1148,13 +1148,22 @@ public class ClientNode implements Runnable {
 		
 		if (os.contains("Windows"))
 		{
-			for(int clear = 0; clear < 50; clear++)
+			System.out.println("** Windows **");
+			System.out.println("** 033143 **");
+			/*try
 			{
-				System.out.println("\b");
+				Runtime.getRuntime().exec("cls");
 			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}*/
+			//System.out.print("\f");
+			System.out.print("\033\143");
 		}
 		else if (os.contains("Linux"))
 		{
+			System.out.println("** Linux **");
 			System.out.print("\033[H\033[2J");
 			System.out.flush();
 		}

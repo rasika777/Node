@@ -1144,19 +1144,7 @@ public class ClientNode implements Runnable {
 	 * : -
 	 */
 	private final static void clearConsole() {
-		final String os = System.getProperty("os.name");
-		
-		if (os.contains("Windows"))
-		{
-			for(int clear = 0; clear < 50; clear++)
-			{
-				System.out.println("\b");
-			}
-		}
-		else if (os.contains("Linux"))
-		{
-			System.out.print("\033[H\033[2J");
-			System.out.flush();
-		}
+		System.out.print("\033[H\033[2J");
+		System.out.flush();
 	}
 }
