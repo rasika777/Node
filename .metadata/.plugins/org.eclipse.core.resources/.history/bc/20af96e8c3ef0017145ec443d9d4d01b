@@ -306,7 +306,7 @@ public class ClientNode implements Runnable {
 					String initCommentTimestamp = st[5];
 
 					for (int j = 0; j < g_oalMessageList.size(); j++) {
-						if (g_oalMessageList.get(j).getIp().equals(initCommentIP)
+						if (g_oalMessageList.get(j).getIp() == initCommentIP
 								&& g_oalMessageList.get(j).getTimestamp() == Integer
 										.parseInt(initCommentTimestamp)) {
 							Reply commentReply = new Reply(st[2],
