@@ -68,7 +68,8 @@ public class ClientNode implements Runnable {
 
 			try {
 				// Incoming packet
-				DatagramPacket incomingPacket = receivePacket(clientSocket,
+
+        DatagramPacket incomingPacket = receivePacket(clientSocket,
 						receiveData, receiveData.length);
 
 				byte[] data = incomingPacket.getData();
@@ -344,7 +345,7 @@ public class ClientNode implements Runnable {
 						g_iTimeStamp = iTimeStampFromMessage;
 					}
 
-					String mode = st[1];
+					String mode = st[2];
 					String rankVal = st[st.length - 1];
 
 					if (mode.equals("F")) {
@@ -728,6 +729,9 @@ public class ClientNode implements Runnable {
 				return true;
 			}
 		}
+                
+  
+                
 
 		return false;
 	}
@@ -1018,29 +1022,110 @@ public class ClientNode implements Runnable {
 
 		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = rankList.size();
 
 		for (int i = 0; i < rankList.size(); i++) {
 			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
 					+ rankList.get(i).getValue() + " Ranked By: "
 					+ rankList.get(i).getIp() + ", At: "
 					+ rankList.get(i).getTimestamp() + ")");
+                        
+                        total += rankList.get(i).getValue();
 
 		}
-	}
+                
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
+        }
 	
+        public void displayAverageFileRanks(String fileName) {
+		clearConsole();
+
+		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
+		System.out.println("");
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = rankList.size();
+
+		for (int i = 0; i < rankList.size(); i++) {
+//			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
+//					+ rankList.get(i).getValue() + " Ranked By: "
+//					+ rankList.get(i).getIp() + ", At: "
+//					+ rankList.get(i).getTimestamp() + ")");
+                        if(rankList.get(i).GetFileName().equals(fileName))
+                        {
+                            total += rankList.get(i).getValue();
+                        }
+		}
+                
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
+        }
+        
 	public void displayCommentRanks() {
 		clearConsole();
 
 		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = comRankList.size();
 
 		for (int i = 0; i < comRankList.size(); i++) {
 			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
 					+ comRankList.get(i).getValue() + " Ranked By: "
 					+ comRankList.get(i).getIp() + ", At: "
 					+ comRankList.get(i).getTimestamp() + ")");
+                        
+                        total += comRankList.get(i).getValue();
 
 		}
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
+	}
+        
+        public void displayAverageCommentRanks() {
+		clearConsole();
+
+		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
+		System.out.println("");
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = comRankList.size();
+
+		for (int i = 0; i < comRankList.size(); i++) {
+//			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
+//					+ comRankList.get(i).getValue() + " Ranked By: "
+//					+ comRankList.get(i).getIp() + ", At: "
+//					+ comRankList.get(i).getTimestamp() + ")");
+                        
+                        total += comRankList.get(i).getValue();
+
+		}
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
 	}
 
 	/*
@@ -1049,7 +1134,7 @@ public class ClientNode implements Runnable {
 	 * Return : Created message, String Created : 2017/10/27, Rasika Bandara
 	 * Updates : -
 	 */
-	private static String createMessage(ArrayList<String> p_alMsgParts) {
+        private static String createMessage(ArrayList<String> p_alMsgParts) {
 		String sMsg = "";
 
 		StringBuilder sbMsg = new StringBuilder();
