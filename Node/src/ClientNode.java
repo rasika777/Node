@@ -290,7 +290,7 @@ public class ClientNode implements Runnable {
 				}
 				// reply message
 				else if (reqResponse.equals("COMRPL")) {
-					/* Update logical time stamp */
+										/* Update logical time stamp */
 					int iTimeStampFromMessage = Integer.parseInt(st[3]);
 					if (g_iTimeStamp < iTimeStampFromMessage) {
 						g_iTimeStamp = iTimeStampFromMessage;
@@ -306,37 +306,46 @@ public class ClientNode implements Runnable {
 					String initCommentIP = st[4];
 					String initCommentTimestamp = st[5];
 
+					boolean isReplyAvailable = false;
+					
 					for (int j = 0; j < g_oalMessageList.size(); j++) {
 						if (g_oalMessageList.get(j).getIp().equals(initCommentIP)
 								&& g_oalMessageList.get(j).getTimestamp() == Integer
 										.parseInt(initCommentTimestamp)) {
 							Reply commentReply = new Reply(st[2],
 									iTimeStampFromMessage, sComment);
-							g_oalMessageList.get(j).setReplies(commentReply);
+							
+						    isReplyAvailable = isAlreadyAvailableCommentReply(commentReply, g_oalMessageList.get(j));
+						    if(!isReplyAvailable)
+						    	g_oalMessageList.get(j).setReplies(commentReply);
 						}
 					}
 
+					if(!isReplyAvailable)
+					{
 					/* Forward reply message to other nodes */
 					int iHopCount = Integer.parseInt(st[6]) + 1; // Increment
 																	// hop count
-					for (int j = 0; j < neighbours.size(); j++) {
-						if (neighbours.get(j).getIp() != incomingPacket
-								.getAddress().getHostAddress()
-								&& iHopCount < 11) {
-							ArrayList<String> salCommentMsg = new ArrayList<String>(
-									Arrays.asList("COMRPL", st[2], st[3],
-											st[4], st[5],
-											Integer.toString(iHopCount),
-											sComment));
-
-							String sCommentMsg = createMessage(salCommentMsg);
-							sendPacket(clientSocket, sCommentMsg.getBytes(),
-									sCommentMsg.length(),
-									InetAddress.getByName(neighbours.get(j)
-											.getIp()), neighbours.get(j)
-											.getPort());
+						for (int j = 0; j < neighbours.size(); j++) {
+							if (!neighbours.get(j).getIp().equals(incomingPacket
+									.getAddress().getHostAddress())
+									&& iHopCount < 11) {
+								ArrayList<String> salCommentMsg = new ArrayList<String>(
+										Arrays.asList("COMRPL", st[2], st[3],
+												st[4], st[5],
+												Integer.toString(iHopCount),
+												sComment));
+	
+								String sCommentMsg = createMessage(salCommentMsg);
+								sendPacket(clientSocket, sCommentMsg.getBytes(),
+										sCommentMsg.length(),
+										InetAddress.getByName(neighbours.get(j)
+												.getIp()), neighbours.get(j)
+												.getPort());
+							}
 						}
 					}
+					
 				} else if (reqResponse.equals("RANK")) {
 					/* Update logical time stamp */
 					int iTimeStampFromMessage = Integer.parseInt(st[4]);
@@ -1182,6 +1191,22 @@ public class ClientNode implements Runnable {
 			if (g_oalMessageList.get(i).getIp().equals(rankMsg.getIp())
 					&& g_oalMessageList.get(i).getTimestamp() == rankMsg
 							.getTimestamp()) {
+
+				bIsAlreadyAvailable = true;
+				break;
+			}
+		}
+
+		return bIsAlreadyAvailable;
+	}
+
+        private static boolean isAlreadyAvailableCommentReply(Reply reply, Message comment) {
+		boolean bIsAlreadyAvailable = false;
+
+		for (int i = 0; i < comment.getReplies().size(); i++) {
+			if (comment.getReplies().get(i).getIp().equals(reply.getIp())
+					&& comment.getReplies().get(i).getTimestamp() == reply.getTimestamp()
+							) {
 
 				bIsAlreadyAvailable = true;
 				break;
