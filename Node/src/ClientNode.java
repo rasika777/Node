@@ -399,8 +399,7 @@ public class ClientNode implements Runnable {
 									sendPacket(clientSocket,
 											sCommentMsg.getBytes(),
 											sCommentMsg.length(),
-											InetAddress.getByName(neighbours
-													.get(j).getIp()),
+											InetAddress.getByName(neighbours.get(j).getIp()),
 											neighbours.get(j).getPort());
 								}
 							}
@@ -408,23 +407,65 @@ public class ClientNode implements Runnable {
 					} else {
 						if (comRankList != null) {
 
-							String nodeKey;
+							String nodeKey = st[6];
+                                                        boolean result = false;
+                                                        
 							for (int i = 0; i < comRankList.size(); i++) {
 								Rank comRank = comRankList.get(i);
 
 								if (comRank != null) {
-									String myKey = comRank.getIp() + "-"
-											+ comRank.getTimestamp();
+									String myKey =  comRank.GetCommentId();
+                                                                        
+                                                                        System.out.println(myKey);
 
-									// if(myKey.equals(nodeKey))
-									// {
+									 if(myKey.equals(nodeKey))
+									 {
+                                                                             result = true;
+									 }
+                                                                }
+                                                        }
+                                                        
+                                                        if(result == false)
+                                                        {
+                                                            Rank comRank = new Rank(st[3],iTimeStampFromMessage, Integer.parseInt(rankVal), nodeKey, 1);
+                                                                     
+                                                             comRankList.add(comRank);
 
-									// }
+                                                        
+                                                                         
+                                                                         int iHopCount = Integer.parseInt(st[4]) + 1; 
+                                                                         
+                                                                         /////////////////////////
+                                                                         for (int j = 0; j < neighbours.size(); j++) {
+                                                                            if (neighbours.get(j).getIp() != incomingPacket
+										.getAddress().getHostAddress()
+										&& iHopCount < 11) {
+
+									ArrayList<String> salCommentMsg = new ArrayList<String>(
+											Arrays.asList(
+													"RANK",
+													"C",
+													IPAddress.getHostAddress(),
+													Integer.toString(g_iTimeStamp),
+													Integer.toString(iHopCount),
+													nodeKey, rankVal));
+									String sCommentMsg = createMessage(salCommentMsg);
+									sendPacket(clientSocket,
+											sCommentMsg.getBytes(),
+											sCommentMsg.length(),
+											InetAddress.getByName(neighbours.get(j).getIp()),
+											neighbours.get(j).getPort());
+                                                                        
+                                                                        
+                                                                            }
+                                                                         }
+							
+                                                                         //////////////////////////
 								}
 							}
 						}
 						// once found th e
-					}
+					
 
 				}
 
@@ -1270,3 +1311,4 @@ public class ClientNode implements Runnable {
 		}
 	}
 }
+
