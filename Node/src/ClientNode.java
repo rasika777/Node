@@ -427,7 +427,7 @@ public class ClientNode implements Runnable {
                                                         
                                                         if(result == false)
                                                         {
-                                                            Rank comRank = new Rank(st[3],iTimeStampFromMessage, Integer.parseInt(rankVal), nodeKey, 1);
+                                                            Rank comRank = new Rank(st[3],iTimeStampFromMessage,nodeKey, Integer.parseInt(rankVal), 1);
                                                                      
                                                              comRankList.add(comRank);
 
