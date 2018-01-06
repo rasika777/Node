@@ -110,8 +110,7 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 
 
 				int rankValue = Integer.parseInt(rankGiven);
-                
-				/* comment Id */
+
 				String key = idGiven;
 
 				dcCommandHandling.rank(key, rankValue, 2);

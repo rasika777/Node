@@ -69,7 +69,7 @@ public class ClientNode implements Runnable {
 			try {
 				// Incoming packet
 
-				DatagramPacket incomingPacket = receivePacket(clientSocket,
+        DatagramPacket incomingPacket = receivePacket(clientSocket,
 						receiveData, receiveData.length);
 
 				byte[] data = incomingPacket.getData();
@@ -266,33 +266,31 @@ public class ClientNode implements Runnable {
 					/* Add message to message list */
 					if (!isAlreadyAvailableComment(oMsg)) {
 						g_oalMessageList.add(oMsg);
+					}
 
-						/* Forward comment message to other nodes */
-						int iHopCount = Integer.parseInt(st[4]) + 1; // Increment
-																		// hop
-																		// count
-						for (int j = 0; j < neighbours.size(); j++) {
-							if (neighbours.get(j).getIp() != incomingPacket
-									.getAddress().getHostAddress()
-									&& iHopCount < 11) {
-								ArrayList<String> salCommentMsg = new ArrayList<String>(
-										Arrays.asList("COM", st[2], st[3],
-												Integer.toString(iHopCount),
-												sComment));
-								String sCommentMsg = createMessage(salCommentMsg);
-								sendPacket(clientSocket,
-										sCommentMsg.getBytes(),
-										sCommentMsg.length(),
-										InetAddress.getByName(neighbours.get(j)
-												.getIp()), neighbours.get(j)
-												.getPort());
-							}
+					/* Forward comment message to other nodes */
+					int iHopCount = Integer.parseInt(st[4]) + 1; // Increment
+																	// hop count
+					for (int j = 0; j < neighbours.size(); j++) {
+						if (neighbours.get(j).getIp() != incomingPacket
+								.getAddress().getHostAddress()
+								&& iHopCount < 11) {
+							ArrayList<String> salCommentMsg = new ArrayList<String>(
+									Arrays.asList("COM", st[2], st[3],
+											Integer.toString(iHopCount),
+											sComment));
+							String sCommentMsg = createMessage(salCommentMsg);
+							sendPacket(clientSocket, sCommentMsg.getBytes(),
+									sCommentMsg.length(),
+									InetAddress.getByName(neighbours.get(j)
+											.getIp()), neighbours.get(j)
+											.getPort());
 						}
 					}
 				}
 				// reply message
 				else if (reqResponse.equals("COMRPL")) {
-					/* Update logical time stamp */
+										/* Update logical time stamp */
 					int iTimeStampFromMessage = Integer.parseInt(st[3]);
 					if (g_iTimeStamp < iTimeStampFromMessage) {
 						g_iTimeStamp = iTimeStampFromMessage;
@@ -309,28 +307,25 @@ public class ClientNode implements Runnable {
 					String initCommentTimestamp = st[5];
 
 					boolean isReplyAvailable = false;
-
+					
 					for (int j = 0; j < g_oalMessageList.size(); j++) {
-						if (g_oalMessageList.get(j).getIp()
-								.equals(initCommentIP)
+						if (g_oalMessageList.get(j).getIp().equals(initCommentIP)
 								&& g_oalMessageList.get(j).getTimestamp() == Integer
 										.parseInt(initCommentTimestamp)) {
 							Reply commentReply = new Reply(st[2],
 									iTimeStampFromMessage, sComment);
-
-							isReplyAvailable = isAlreadyAvailableCommentReply(
-									commentReply, g_oalMessageList.get(j));
-							if (!isReplyAvailable)
-								g_oalMessageList.get(j)
-										.setReplies(commentReply);
+							
+						    isReplyAvailable = isAlreadyAvailableCommentReply(commentReply, g_oalMessageList.get(j));
+						    if(!isReplyAvailable)
+						    	g_oalMessageList.get(j).setReplies(commentReply);
 						}
 					}
 
-					if (!isReplyAvailable) {
-						/* Forward reply message to other nodes */
-						int iHopCount = Integer.parseInt(st[6]) + 1; // Increment
-																		// hop
-																		// count
+					if(!isReplyAvailable)
+					{
+					/* Forward reply message to other nodes */
+					int iHopCount = Integer.parseInt(st[6]) + 1; // Increment
+																	// hop count
 						for (int j = 0; j < neighbours.size(); j++) {
 							if (neighbours.get(j).getIp() != (incomingPacket
 									.getAddress().getHostAddress())
@@ -340,10 +335,9 @@ public class ClientNode implements Runnable {
 												st[4], st[5],
 												Integer.toString(iHopCount),
 												sComment));
-
+	
 								String sCommentMsg = createMessage(salCommentMsg);
-								sendPacket(clientSocket,
-										sCommentMsg.getBytes(),
+								sendPacket(clientSocket, sCommentMsg.getBytes(),
 										sCommentMsg.length(),
 										InetAddress.getByName(neighbours.get(j)
 												.getIp()), neighbours.get(j)
@@ -351,7 +345,7 @@ public class ClientNode implements Runnable {
 							}
 						}
 					}
-
+					
 				} else if (reqResponse.equals("RANK")) {
 					/* Update logical time stamp */
 					int iTimeStampFromMessage = Integer.parseInt(st[4]);
@@ -397,16 +391,15 @@ public class ClientNode implements Runnable {
 											Arrays.asList(
 													"RANK",
 													"F",
-													st[3],
-													st[4],
+													IPAddress.getHostAddress(),
+													Integer.toString(g_iTimeStamp),
 													Integer.toString(iHopCount),
 													fileName, rankVal));
 									String sCommentMsg = createMessage(salCommentMsg);
 									sendPacket(clientSocket,
 											sCommentMsg.getBytes(),
 											sCommentMsg.length(),
-											InetAddress.getByName(neighbours
-													.get(j).getIp()),
+											InetAddress.getByName(neighbours.get(j).getIp()),
 											neighbours.get(j).getPort());
 								}
 							}
@@ -415,63 +408,64 @@ public class ClientNode implements Runnable {
 						if (comRankList != null) {
 
 							String nodeKey = st[6];
-							boolean result = false;
-
+                                                        boolean result = false;
+                                                        
 							for (int i = 0; i < comRankList.size(); i++) {
 								Rank comRank = comRankList.get(i);
 
 								if (comRank != null) {
-									String myKey = comRank.GetCommentId();
+									String myKey =  comRank.GetCommentId();
+                                                                        
+                                                                        System.out.println(myKey);
 
-									System.out.println(myKey);
+									 if(myKey.equals(nodeKey))
+									 {
+                                                                             result = true;
+									 }
+                                                                }
+                                                        }
+                                                        
+                                                        if(result == false)
+                                                        {
+                                                            Rank comRank = new Rank(st[3],iTimeStampFromMessage,nodeKey, Integer.parseInt(rankVal), 1);
+                                                                     
+                                                             comRankList.add(comRank);
 
-									if (myKey.equals(nodeKey)) {
-										result = true;
-									}
+                                                        
+                                                                         
+                                                                         int iHopCount = Integer.parseInt(st[4]) + 1; 
+                                                                         
+                                                                         /////////////////////////
+                                                                         for (int j = 0; j < neighbours.size(); j++) {
+                                                                            if (neighbours.get(j).getIp() != incomingPacket
+										.getAddress().getHostAddress()
+										&& iHopCount < 11) {
+
+									ArrayList<String> salCommentMsg = new ArrayList<String>(
+											Arrays.asList(
+													"RANK",
+													"C",
+													IPAddress.getHostAddress(),
+													Integer.toString(g_iTimeStamp),
+													Integer.toString(iHopCount),
+													nodeKey, rankVal));
+									String sCommentMsg = createMessage(salCommentMsg);
+									sendPacket(clientSocket,
+											sCommentMsg.getBytes(),
+											sCommentMsg.length(),
+											InetAddress.getByName(neighbours.get(j).getIp()),
+											neighbours.get(j).getPort());
+                                                                        
+                                                                        
+                                                                            }
+                                                                         }
+							
+                                                                         //////////////////////////
 								}
-							}
-
-							if (result == false) {
-								Rank comRank = new Rank(st[3],
-										iTimeStampFromMessage, nodeKey,
-										Integer.parseInt(rankVal), 1);
-
-								comRankList.add(comRank);
-
-								int iHopCount = Integer.parseInt(st[4]) + 1;
-
-								// ///////////////////////
-								for (int j = 0; j < neighbours.size(); j++) {
-									if (neighbours.get(j).getIp() != incomingPacket
-											.getAddress().getHostAddress()
-											&& iHopCount < 11) {
-
-										ArrayList<String> salCommentMsg = new ArrayList<String>(
-												Arrays.asList(
-														"RANK",
-														"C",
-														st[3],
-														st[4],
-														Integer.toString(iHopCount),
-														nodeKey, rankVal));
-										String sCommentMsg = createMessage(salCommentMsg);
-										sendPacket(
-												clientSocket,
-												sCommentMsg.getBytes(),
-												sCommentMsg.length(),
-												InetAddress
-														.getByName(neighbours
-																.get(j).getIp()),
-												neighbours.get(j).getPort());
-
-									}
-								}
-
-								// ////////////////////////
 							}
 						}
-					}
-					// once found th e
+						// once found th e
+					
 
 				}
 
@@ -771,12 +765,23 @@ public class ClientNode implements Runnable {
 	}
 
 	public boolean IsFileNameFound(String fileName) {
+		int iAssignedFileNamesCounter = 0;
 
 		for (int i = 0; i < g_saContainingFiles.length; i++) {
-			if (g_saContainingFiles[i].equals(fileName)) {
+			if (g_saContainingFiles[i] != null) {
+				iAssignedFileNamesCounter++;
+			}
+		}
+
+		for (int i = 0; i < iAssignedFileNamesCounter; i++) {
+			if (g_saContainingFiles[i] != null
+					&& g_saContainingFiles[i].equals(fileName)) {
 				return true;
 			}
-		}		
+		}
+                
+  
+                
 
 		return false;
 	}
@@ -922,12 +927,7 @@ public class ClientNode implements Runnable {
 	 * filename , rank , <1=File, 2=Comment> Return : None Created : 2017/12/08,
 	 * Tharindu Kumarapperuma Updates : -
 	 */
-	public void rank(String commentId, int rank, int option) {
-		
-		Message initComment = g_oalMessageList.get(Integer.parseInt(commentId) - 1);
-		
-		String key = initComment.getIp() + ":" + commentId;
-		
+	public void rank(String key, int rank, int option) {
 		if (option == 1) {
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
@@ -937,8 +937,7 @@ public class ClientNode implements Runnable {
 					rank, key, option);
 
 			// check file name contains or not, add only if contains
-			
-			if (!isAlreadyAvailableRank(oMsg)) {
+			if (IsFileNameFound(key)) {
 				rankList.add(oMsg);
 			}
 
@@ -971,11 +970,11 @@ public class ClientNode implements Runnable {
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
-			Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, key,
-					rank, option);
+			Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+					key, rank, option);
 
 			// check file name contins or not, add only if contains
-			if (!IsCommentFound(key)) {
+			if (IsCommentFound(key)) {
 				comRankList.add(oMsg);
 			}
 
@@ -1037,9 +1036,12 @@ public class ClientNode implements Runnable {
 	}
 
 	/*
-	 * Method : displayForum Description : Display the current forum in the
-	 * order of the time stamp Parameter <> : None Return : None Created :
-	 * 2017/12/06, Rasika Bandara Updates : -
+	 * Method : displayForum
+	 * Description : Display the current forum in the order of the time stamp
+	 * Parameter <> : None
+	 * Return : None
+	 * Created : 2017/12/06, Rasika Bandara
+	 * Updates : -
 	 */
 	public void displayForum() {
 		clearConsole();
@@ -1047,8 +1049,7 @@ public class ClientNode implements Runnable {
 		Collections.sort(g_oalMessageList, Message.COMPARE_BY_TIMESTAMP);
 
 		for (int i = 0; i < g_oalMessageList.size(); i++) {
-			System.out.println(String.format("%02d", i + 1) + ". "
-					+ g_oalMessageList.get(i).getComment() + " (By: "
+			System.out.println(String.format("%02d", i+1) + ". " + g_oalMessageList.get(i).getComment() + " (By: "
 					+ g_oalMessageList.get(i).getIp() + ", At: "
 					+ g_oalMessageList.get(i).getTimestamp() + ")");
 			for (int j = 0; j < g_oalMessageList.get(i).getReplies().size(); j++) {
@@ -1071,108 +1072,110 @@ public class ClientNode implements Runnable {
 
 		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = rankList.size();
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = rankList.size();
 
 		for (int i = 0; i < rankList.size(); i++) {
 			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
 					+ rankList.get(i).getValue() + " Ranked By: "
 					+ rankList.get(i).getIp() + ", At: "
 					+ rankList.get(i).getTimestamp() + ")");
-
-			total += rankList.get(i).getValue();
+                        
+                        total += rankList.get(i).getValue();
 
 		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
-	}
-
-	public void displayAverageFileRanks(String fileName) {
+                
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
+        }
+	
+        public void displayAverageFileRanks(String fileName) {
 		clearConsole();
 
 		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = rankList.size();
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = rankList.size();
 
 		for (int i = 0; i < rankList.size(); i++) {
-			// System.out.println(rankList.get(i).GetFileName() + " (Rank : "
-			// + rankList.get(i).getValue() + " Ranked By: "
-			// + rankList.get(i).getIp() + ", At: "
-			// + rankList.get(i).getTimestamp() + ")");
-			if (rankList.get(i).GetFileName().equals(fileName)) {
-				total += rankList.get(i).getValue();
-			}
+//			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
+//					+ rankList.get(i).getValue() + " Ranked By: "
+//					+ rankList.get(i).getIp() + ", At: "
+//					+ rankList.get(i).getTimestamp() + ")");
+                        if(rankList.get(i).GetFileName().equals(fileName))
+                        {
+                            total += rankList.get(i).getValue();
+                        }
 		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
-	}
-
+                
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
+        }
+        
 	public void displayCommentRanks() {
 		clearConsole();
 
 		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = comRankList.size();
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = comRankList.size();
 
 		for (int i = 0; i < comRankList.size(); i++) {
 			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
 					+ comRankList.get(i).getValue() + " Ranked By: "
 					+ comRankList.get(i).getIp() + ", At: "
 					+ comRankList.get(i).getTimestamp() + ")");
-
-			total += comRankList.get(i).getValue();
+                        
+                        total += comRankList.get(i).getValue();
 
 		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
 	}
-
-	public void displayAverageCommentRanks() {
+        
+        public void displayAverageCommentRanks() {
 		clearConsole();
 
 		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = comRankList.size();
+                
+                double avgRank = 0.0;
+                double total = 0.0;
+                double count = comRankList.size();
 
 		for (int i = 0; i < comRankList.size(); i++) {
-			// System.out.println(comRankList.get(i).GetCommentId() +
-			// " (Rank : "
-			// + comRankList.get(i).getValue() + " Ranked By: "
-			// + comRankList.get(i).getIp() + ", At: "
-			// + comRankList.get(i).getTimestamp() + ")");
-
-			total += comRankList.get(i).getValue();
+//			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
+//					+ comRankList.get(i).getValue() + " Ranked By: "
+//					+ comRankList.get(i).getIp() + ", At: "
+//					+ comRankList.get(i).getTimestamp() + ")");
+                        
+                        total += comRankList.get(i).getValue();
 
 		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
+                
+                if(count > 0){
+                avgRank = total / count;
+                }
+                
+                System.out.println("Average Rank : "+ avgRank);
 	}
 
 	/*
@@ -1181,7 +1184,7 @@ public class ClientNode implements Runnable {
 	 * Return : Created message, String Created : 2017/10/27, Rasika Bandara
 	 * Updates : -
 	 */
-	private static String createMessage(ArrayList<String> p_alMsgParts) {
+        private static String createMessage(ArrayList<String> p_alMsgParts) {
 		String sMsg = "";
 
 		StringBuilder sbMsg = new StringBuilder();
@@ -1227,23 +1230,7 @@ public class ClientNode implements Runnable {
 
 		for (int i = 0; i < g_oalMessageList.size(); i++) {
 			if (g_oalMessageList.get(i).getIp().equals(rankMsg.getIp())
-					) {
-
-				bIsAlreadyAvailable = true;
-				break;
-			}
-		}
-
-		return bIsAlreadyAvailable;
-	}
-
-	private static boolean isAlreadyAvailableCommentReply(Reply reply,
-			Message comment) {
-		boolean bIsAlreadyAvailable = false;
-
-		for (int i = 0; i < comment.getReplies().size(); i++) {
-			if (comment.getReplies().get(i).getIp().equals(reply.getIp())
-					&& comment.getReplies().get(i).getTimestamp() == reply
+					&& g_oalMessageList.get(i).getTimestamp() == rankMsg
 							.getTimestamp()) {
 
 				bIsAlreadyAvailable = true;
@@ -1253,8 +1240,23 @@ public class ClientNode implements Runnable {
 
 		return bIsAlreadyAvailable;
 	}
-    
-	/* check for available file ranks */
+
+        private static boolean isAlreadyAvailableCommentReply(Reply reply, Message comment) {
+		boolean bIsAlreadyAvailable = false;
+
+		for (int i = 0; i < comment.getReplies().size(); i++) {
+			if (comment.getReplies().get(i).getIp().equals(reply.getIp())
+					&& comment.getReplies().get(i).getTimestamp() == reply.getTimestamp()
+							) {
+
+				bIsAlreadyAvailable = true;
+				break;
+			}
+		}
+
+		return bIsAlreadyAvailable;
+	}
+
 	private static boolean isAlreadyAvailableRank(Rank rank) {
 		boolean isAvailable = false;
 
@@ -1265,7 +1267,8 @@ public class ClientNode implements Runnable {
 			{
 				if (rankList.get(i).GetFileName().equals(rank.GetFileName())
 						&& rankList.get(i).getIp().equals(rank.getIp())
-						) {
+						&& rankList.get(i).getTimestamp() == rank
+								.getTimestamp()) {
 
 					isAvailable = true;
 					break;
@@ -1293,14 +1296,19 @@ public class ClientNode implements Runnable {
 	 */
 	private final static void clearConsole() {
 		final String os = System.getProperty("os.name");
-
-		if (os.contains("Windows")) {
-			for (int clear = 0; clear < 50; clear++) {
+		
+		if (os.contains("Windows"))
+		{
+			for(int clear = 0; clear < 50; clear++)
+			{
 				System.out.println("\b");
 			}
-		} else if (os.contains("Linux")) {
+		}
+		else if (os.contains("Linux"))
+		{
 			System.out.print("\033[H\033[2J");
 			System.out.flush();
 		}
 	}
 }
+

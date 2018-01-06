@@ -397,8 +397,8 @@ public class ClientNode implements Runnable {
 											Arrays.asList(
 													"RANK",
 													"F",
-													st[3],
-													st[4],
+													IPAddress.getHostAddress(),
+													Integer.toString(g_iTimeStamp),
 													Integer.toString(iHopCount),
 													fileName, rankVal));
 									String sCommentMsg = createMessage(salCommentMsg);
@@ -450,8 +450,9 @@ public class ClientNode implements Runnable {
 												Arrays.asList(
 														"RANK",
 														"C",
-														st[3],
-														st[4],
+														IPAddress
+																.getHostAddress(),
+														Integer.toString(g_iTimeStamp),
 														Integer.toString(iHopCount),
 														nodeKey, rankVal));
 										String sCommentMsg = createMessage(salCommentMsg);

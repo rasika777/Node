@@ -397,8 +397,8 @@ public class ClientNode implements Runnable {
 											Arrays.asList(
 													"RANK",
 													"F",
-													st[3],
-													st[4],
+													IPAddress.getHostAddress(),
+													Integer.toString(g_iTimeStamp),
 													Integer.toString(iHopCount),
 													fileName, rankVal));
 									String sCommentMsg = createMessage(salCommentMsg);
@@ -450,8 +450,9 @@ public class ClientNode implements Runnable {
 												Arrays.asList(
 														"RANK",
 														"C",
-														st[3],
-														st[4],
+														IPAddress
+																.getHostAddress(),
+														Integer.toString(g_iTimeStamp),
 														Integer.toString(iHopCount),
 														nodeKey, rankVal));
 										String sCommentMsg = createMessage(salCommentMsg);
@@ -922,12 +923,11 @@ public class ClientNode implements Runnable {
 	 * filename , rank , <1=File, 2=Comment> Return : None Created : 2017/12/08,
 	 * Tharindu Kumarapperuma Updates : -
 	 */
-	public void rank(String commentId, int rank, int option) {
+	public void rank(String key, int rank, int option) {
 		
-		Message initComment = g_oalMessageList.get(Integer.parseInt(commentId) - 1);
+		Message initComment = g_oalMessageList.get(key - 1);
 		
-		String key = initComment.getIp() + ":" + commentId;
-		
+		key = IPAddress.getHostAddress() + ":" + key;
 		if (option == 1) {
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
