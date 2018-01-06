@@ -74,7 +74,7 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				dcCommandHandling.fileSearchOption("\"" + sFileName + "\"");
 				break;
 			case 5:
-				System.out.println("5: Comment is selected");
+                                System.out.println("5: Comment is selected");
 				System.out.println("Enter comment message: ");
 				Scanner soReadCommentMsg = new Scanner(System.in);
 				String sCommentMsg = soReadCommentMsg.nextLine();
@@ -99,17 +99,19 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				System.out.println("7: Rank a Comment is selected");
 				System.out.println("Enter Comment sent IP: ");
 				Scanner ipSent = new Scanner(System.in);
+                                String ipGiven = ipSent.nextLine();
+
 
 				System.out.println("Enter ID : ");
 				Scanner commentId = new Scanner(System.in);
+                                String idGiven = commentId.nextLine();
+
 
 				System.out.println("Enter Rank : ");
 				Scanner rank = new Scanner(System.in);
-
-				String ipGiven = ipSent.nextLine();
-				String idGiven = commentId.nextLine();
-
 				String rankGiven = rank.nextLine();
+
+
 				int rankValue = Integer.parseInt(rankGiven);
 
 				String key = ipGiven + ":" + idGiven;
@@ -153,3 +155,4 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 		}
 	}
 }
+
