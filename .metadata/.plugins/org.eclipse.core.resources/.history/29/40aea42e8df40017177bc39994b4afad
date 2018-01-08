@@ -97,6 +97,7 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				break;
 			case 7:
 				System.out.println("7: Rank a Comment is selected");
+				System.out.println("Enter Comment sent IP: ");
 				
 				System.out.println("Enter Comment ID : ");
 				Scanner commentId = new Scanner(System.in);

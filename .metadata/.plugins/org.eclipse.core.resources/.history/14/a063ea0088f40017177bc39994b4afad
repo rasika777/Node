@@ -389,13 +389,8 @@ public class ClientNode implements Runnable {
 																			// hop
 																			// count
 							for (int j = 0; j < neighbours.size(); j++) {
-								
-								// changing Ip to port to test as distinct nodes
-								/*if (neighbours.get(j).getIp() != incomingPacket
+								if (neighbours.get(j).getIp() != incomingPacket
 										.getAddress().getHostAddress()
-										&& iHopCount < 11) {*/
-								if (neighbours.get(j).getPort() != incomingPacket
-										.getPort()
 										&& iHopCount < 11) {
 
 									ArrayList<String> salCommentMsg = new ArrayList<String>(
@@ -931,7 +926,7 @@ public class ClientNode implements Runnable {
 		
 		// need to check
 		Message initComment = g_oalMessageList.get(Integer.parseInt(commentId) - 1);
-		//didn't change this into port cause this parameter is unnecessary 
+		
 		String key = initComment.getIp() + ":" + commentId;
 		
 		if (option == 1) {
@@ -939,10 +934,7 @@ public class ClientNode implements Runnable {
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
-			// changing Ip to port to test as distinct nodes
-			/*Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					rank, key, option);*/
-			Rank oMsg = new Rank(Integer.toString(listeningPort), g_iTimeStamp,
+			Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
 					rank, key, option);
 
 			// check file name contains or not, add only if contains
@@ -954,12 +946,11 @@ public class ClientNode implements Runnable {
 			/* Create rank message */
 			int iHopCount = 0;
 			
-			// changing Ip to port to test as distinct nodes
-			/*ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
+			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "F", IPAddress.getHostAddress(),
 					Integer.toString(g_iTimeStamp),
 					Integer.toString(iHopCount), key.trim(),
-					Integer.toString(rank)));*/
+					Integer.toString(rank)));
 			
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "F", Integer.toString(listeningPort),
@@ -988,10 +979,7 @@ public class ClientNode implements Runnable {
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
-			// changing Ip to port to test as distinct nodes
-			/*Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, key,
-					rank, option);*/
-			Rank oMsg = new Rank(Integer.toString(listeningPort), g_iTimeStamp, key,
+			Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, key,
 					rank, option);
 
 			// check file name contins or not, add only if contains
@@ -1002,7 +990,7 @@ public class ClientNode implements Runnable {
 			/* Create rank message */
 			int iHopCount = 0;
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
-					"RANK", "C", Integer.toString(listeningPort),
+					"RANK", "C", IPAddress.getHostAddress(),
 					Integer.toString(g_iTimeStamp),
 					Integer.toString(iHopCount), key.trim(),
 					Integer.toString(rank)));

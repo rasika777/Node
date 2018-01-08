@@ -931,7 +931,7 @@ public class ClientNode implements Runnable {
 		
 		// need to check
 		Message initComment = g_oalMessageList.get(Integer.parseInt(commentId) - 1);
-		//didn't change this into port cause this parameter is unnecessary 
+		
 		String key = initComment.getIp() + ":" + commentId;
 		
 		if (option == 1) {
