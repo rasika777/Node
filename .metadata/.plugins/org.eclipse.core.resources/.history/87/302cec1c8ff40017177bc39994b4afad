@@ -932,18 +932,30 @@ public class ClientNode implements Runnable {
 	 */
 	public void rank(String rankInput, int rank, int option) {
 		
+<<<<<<< HEAD
+		// need to check
+		Message initComment = g_oalMessageList.get(Integer.parseInt(commentId) - 1);
+		//didn't change this into port cause this parameter is unnecessary 
+		String key = initComment.getIp() + ":" + commentId;
+=======
+		
+>>>>>>> eac0b892938ec46d64d4e5c2e7f509d60d777b8d
 		
 		if (option == 1) {
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
+<<<<<<< HEAD
 			// changing Ip to port to test as distinct nodes
 			/*Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					rank, rankInput, option);*/
+					rank, key, option);*/
 			Rank oMsg = new Rank(Integer.toString(listeningPort), g_iTimeStamp,
-					rank, rankInput, option);
-
+					rank, key, option);
+=======
+			Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+					rank, rankInput, option);  //rankInput = file name
+>>>>>>> eac0b892938ec46d64d4e5c2e7f509d60d777b8d
 
 			// check file name contains or not, add only if contains
 			
@@ -958,13 +970,17 @@ public class ClientNode implements Runnable {
 			/*ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "F", IPAddress.getHostAddress(),
 					Integer.toString(g_iTimeStamp),
-					Integer.toString(iHopCount), rankInput.trim(),
+<<<<<<< HEAD
+					Integer.toString(iHopCount), key.trim(),
 					Integer.toString(rank)));*/
 			
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "F", Integer.toString(listeningPort),
 					Integer.toString(g_iTimeStamp),
+					Integer.toString(iHopCount), key.trim(),
+=======
 					Integer.toString(iHopCount), rankInput.trim(), 
+>>>>>>> eac0b892938ec46d64d4e5c2e7f509d60d777b8d
 					Integer.toString(rank)));
 
 			String sCommentMsg = createMessage(rankMsg);
@@ -1140,7 +1156,7 @@ public void displayFileRanks() {
                         
                         if(!rankMappedByFileName.containsKey(rankList.get(i).GetFileName()))
                         {
-                            ArrayList<Object> lst = new ArrayList<Object>();
+                            ArrayList<Object> lst = new ArrayList<>();
                             rankMappedByFileName.put(rankList.get(i).GetFileName(),lst);
                         }
                         
@@ -1157,7 +1173,7 @@ public void displayFileRanks() {
                     total = 0.0;
                     count = 0.0;
                 
-                    ArrayList<Object> finalList = new ArrayList<Object>();
+                    ArrayList<Object> finalList = new ArrayList<>();
                     String fileName = rankList.get(x).GetFileName();
                     finalList = rankMappedByFileName.get(fileName);
                     
@@ -1167,7 +1183,7 @@ public void displayFileRanks() {
                         count = finalList.size();
                     
                         for (int j = 0; j < count; j++) {
-                            total += (Integer)finalList.get(j); 
+                            total += (int)finalList.get(j); 
                         }
                         
                        if(count > 0)
@@ -1206,7 +1222,7 @@ public void displayFileRanks() {
                         
                          if(!rankMapperdByCommentID.containsKey(comRankList.get(i).GetCommentId()))
                         {
-                            ArrayList<Object> lst = new ArrayList<Object>();
+                            ArrayList<Object> lst = new ArrayList<>();
                             rankMapperdByCommentID.put(comRankList.get(i).GetCommentId(),lst);
                         }
                         
@@ -1221,7 +1237,7 @@ public void displayFileRanks() {
                     total = 0.0;
                     count = 0.0;
                 
-                    ArrayList<Object> finalList = new ArrayList<Object>();
+                    ArrayList<Object> finalList = new ArrayList<>();
                     String cmId = comRankList.get(x).GetCommentId();
                     finalList = rankMapperdByCommentID.get(cmId);
                     
@@ -1231,7 +1247,7 @@ public void displayFileRanks() {
                         count = finalList.size();
                     
                         for (int j = 0; j < count; j++) {
-                            total += (Integer)finalList.get(j); 
+                            total += (int)finalList.get(j); 
                         }
                         
                        if(count > 0)
