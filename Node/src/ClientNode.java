@@ -15,6 +15,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ClientNode implements Runnable {
 	static String[] g_saConnectedIPs = new String[2]; // IP addresses of the
@@ -29,11 +31,11 @@ public class ClientNode implements Runnable {
 	private static int g_iTimeStamp = 0; // Logical time stamp
 	private static ArrayList<Message> g_oalMessageList = new ArrayList<Message>(); // Message
 																					// list
-				
- 	HashMap<String, ArrayList<Object>> rankMappedByFileName = new HashMap<String,ArrayList<Object>>();
-        HashMap<String, ArrayList<Object>> rankMapperdByCommentID = new HashMap<String,ArrayList<Object>>();																	// in
-																					// the
-																					// forum
+
+	HashMap<String, ArrayList<Object>> rankMappedByFileName = new HashMap<String, ArrayList<Object>>();
+	HashMap<String, ArrayList<Object>> rankMapperdByCommentID = new HashMap<String, ArrayList<Object>>(); // in
+	// the
+	// forum
 	private static ArrayList<Rank> rankList = new ArrayList<Rank>();// Rank list
 																	// - Files
 	private static ArrayList<Rank> comRankList = new ArrayList<Rank>(); // Rank
@@ -392,14 +394,15 @@ public class ClientNode implements Runnable {
 																			// hop
 																			// count
 							for (int j = 0; j < neighbours.size(); j++) {
-								
+
 								// changing Ip to port to test as distinct nodes
-								/*if (neighbours.get(j).getIp() != incomingPacket
-										.getAddress().getHostAddress()
-										&& iHopCount < 11) {*/
+								/*
+								 * if (neighbours.get(j).getIp() !=
+								 * incomingPacket .getAddress().getHostAddress()
+								 * && iHopCount < 11) {
+								 */
 								if (neighbours.get(j).getPort() != incomingPacket
-										.getPort()
-										&& iHopCount < 11) {
+										.getPort() && iHopCount < 11) {
 
 									ArrayList<String> salCommentMsg = new ArrayList<String>(
 											Arrays.asList(
@@ -420,64 +423,60 @@ public class ClientNode implements Runnable {
 							}
 						}
 					} else {
-						if (comRankList != null) {
 
-							String nodeKey = st[6];
-							boolean result = false;
+						String nodeKey = st[6];
+						boolean isCommentRankAvailable = false;
+						int commentId = -1;
 
-							for (int i = 0; i < comRankList.size(); i++) {
-								Rank comRank = comRankList.get(i);
+						for (int j = 0; j < g_oalMessageList.size(); j++) {
+							if (g_oalMessageList.get(j).getIp().equals(st[6])
+									&& g_oalMessageList.get(j).getTimestamp() == Integer
+											.parseInt(st[7])) {
 
-								if (comRank != null) {
-									String myKey = comRank.GetCommentId();
+								commentId = j;
 
-									System.out.println(myKey);
-
-									if (myKey.equals(nodeKey)) {
-										result = true;
-									}
-								}
-							}
-
-							if (result == false) {
-								Rank comRank = new Rank(st[3],
-										iTimeStampFromMessage, nodeKey,
-										Integer.parseInt(rankVal), 1);
-
-								comRankList.add(comRank);
-
-								int iHopCount = Integer.parseInt(st[4]) + 1;
-
-								// ///////////////////////
-								for (int j = 0; j < neighbours.size(); j++) {
-									if (neighbours.get(j).getIp() != incomingPacket
-											.getAddress().getHostAddress()
-											&& iHopCount < 11) {
-
-										ArrayList<String> salCommentMsg = new ArrayList<String>(
-												Arrays.asList(
-														"RANK",
-														"C",
-														st[3],
-														st[4],
-														Integer.toString(iHopCount),
-														nodeKey, rankVal));
-										String sCommentMsg = createMessage(salCommentMsg);
-										sendPacket(
-												clientSocket,
-												sCommentMsg.getBytes(),
-												sCommentMsg.length(),
-												InetAddress
-														.getByName(neighbours
-																.get(j).getIp()),
-												neighbours.get(j).getPort());
-
-									}
-								}
-
-								// ////////////////////////
 							}
 						}
+
+						Rank comRank = new Rank(st[3], iTimeStampFromMessage,
+								commentId, Integer.parseInt(rankVal), 1);
+
+						isCommentRankAvailable = isAlreadyAvailableCommentRank(comRank);
+
+						if (!isCommentRankAvailable) {
+
+							comRankList.add(comRank);
+
+							int iHopCount = Integer.parseInt(st[5]) + 1;
+
+							// ///////////////////////
+							for (int j = 0; j < neighbours.size(); j++) {
+								if (neighbours.get(j).getIp() != incomingPacket
+										.getAddress().getHostAddress()
+										&& iHopCount < 11) {
+
+									ArrayList<String> salCommentMsg = new ArrayList<String>(
+											Arrays.asList(
+													"RANK",
+													"C",
+													st[3],
+													st[4],
+													Integer.toString(iHopCount),
+													st[6], st[7], rankVal));
+									String sCommentMsg = createMessage(salCommentMsg);
+									sendPacket(clientSocket,
+											sCommentMsg.getBytes(),
+											sCommentMsg.length(),
+											InetAddress.getByName(neighbours
+													.get(j).getIp()),
+											neighbours.get(j).getPort());
+
+								}
+							}
+
+							// ////////////////////////
+						}
+
 					}
 					// once found th e
 
@@ -784,12 +783,12 @@ public class ClientNode implements Runnable {
 			if (g_saContainingFiles[i].equals(fileName)) {
 				return true;
 			}
-		}		
+		}
 
 		return false;
 	}
 
-	public boolean IsCommentFound(String key) {
+	public boolean IsCommentRankFound(int commentId) {
 
 		boolean result = false;
 
@@ -800,7 +799,7 @@ public class ClientNode implements Runnable {
 			if (msg != null) {
 				myKey = msg.getIp() + ":" + msg.getTimestamp();
 
-				if (myKey.equals(key)) {
+				if (myKey.equals(commentId)) {
 					result = true;
 					break;
 				}
@@ -931,40 +930,41 @@ public class ClientNode implements Runnable {
 	 * Tharindu Kumarapperuma Updates : -
 	 */
 	public void rank(String rankInput, int rank, int option) {
-		
-		
+
 		if (option == 1) {
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
 			// changing Ip to port to test as distinct nodes
-			/*Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					rank, rankInput, option);*/
+			/*
+			 * Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+			 * rank, rankInput, option);
+			 */
 			Rank oMsg = new Rank(Integer.toString(listeningPort), g_iTimeStamp,
 					rank, rankInput, option);
 
-
 			// check file name contains or not, add only if contains
-			
+
 			if (!isAlreadyAvailableRank(oMsg)) {
 				rankList.add(oMsg);
 			}
 
 			/* Create rank message */
 			int iHopCount = 0;
-			
+
 			// changing Ip to port to test as distinct nodes
-			/*ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
-					"RANK", "F", IPAddress.getHostAddress(),
-					Integer.toString(g_iTimeStamp),
-					Integer.toString(iHopCount), rankInput.trim(),
-					Integer.toString(rank)));*/
-			
+			/*
+			 * ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
+			 * "RANK", "F", IPAddress.getHostAddress(),
+			 * Integer.toString(g_iTimeStamp), Integer.toString(iHopCount),
+			 * rankInput.trim(), Integer.toString(rank)));
+			 */
+
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "F", Integer.toString(listeningPort),
 					Integer.toString(g_iTimeStamp),
-					Integer.toString(iHopCount), rankInput.trim(), 
+					Integer.toString(iHopCount), rankInput.trim(),
 					Integer.toString(rank)));
 
 			String sCommentMsg = createMessage(rankMsg);
@@ -983,23 +983,27 @@ public class ClientNode implements Runnable {
 
 		} else if (option == 2) {
 			// for rank comments
-                    Message initComment = g_oalMessageList.get(Integer.parseInt(rankInput) - 1);   // rankInput = comment id 
-		
-		String key = initComment.getIp() + ":" + rankInput;
-                
+			int commentId = Integer.parseInt(rankInput);
+			Message initComment = g_oalMessageList.get(commentId - 1); // rankInput
+																		// =
+																		// comment
+																		// id
+
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
 			// changing Ip to port to test as distinct nodes
-			/*Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, key,
-					rank, option);*/
-			Rank oMsg = new Rank(Integer.toString(listeningPort), g_iTimeStamp, key,
-					rank, option);
+			/*
+			 * Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+			 * key, rank, option);
+			 */
+			Rank rankObj = new Rank(Integer.toString(listeningPort),
+					g_iTimeStamp, commentId, rank, option);
 
 			// check file name contins or not, add only if contains
-			if (!IsCommentFound(key)) {
-				comRankList.add(oMsg);
+			if (!isAlreadyAvailableCommentRank(rankObj)) {
+				comRankList.add(rankObj);
 			}
 
 			/* Create rank message */
@@ -1007,16 +1011,17 @@ public class ClientNode implements Runnable {
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
 					"RANK", "C", Integer.toString(listeningPort),
 					Integer.toString(g_iTimeStamp),
-					Integer.toString(iHopCount), key.trim(),
+					Integer.toString(iHopCount), initComment.getIp(),
+					Integer.toString(initComment.getTimestamp()),
 					Integer.toString(rank)));
 
-			String sCommentMsg = createMessage(rankMsg);
+			String sRankMsg = createMessage(rankMsg);
 
 			/* Send rank to the neighbors */
 			for (int j = 0; j < neighbours.size(); j++) {
 				try {
-					sendPacket(clientSocket, sCommentMsg.getBytes(),
-							sCommentMsg.length(),
+					sendPacket(clientSocket, sRankMsg.getBytes(),
+							sRankMsg.length(),
 							InetAddress.getByName(neighbours.get(j).getIp()),
 							neighbours.get(j).getPort());
 				} catch (UnknownHostException e) {
@@ -1089,15 +1094,39 @@ public class ClientNode implements Runnable {
 		}
 	}
 
-/*	public void displayFileRanks() {
+	/*
+	 * public void displayFileRanks() { clearConsole();
+	 * 
+	 * Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
+	 * System.out.println("");
+	 * 
+	 * double avgRank = 0.0; double total = 0.0; double count = rankList.size();
+	 * 
+	 * for (int i = 0; i < rankList.size(); i++) {
+	 * System.out.println(rankList.get(i).GetFileName() + " (Rank : " +
+	 * rankList.get(i).getValue() + " Ranked By: " + rankList.get(i).getIp() +
+	 * ", At: " + rankList.get(i).getTimestamp() + ")");
+	 * 
+	 * total += rankList.get(i).getValue();
+	 * 
+	 * }
+	 * 
+	 * if (count > 0) { avgRank = total / count; }
+	 * 
+	 * System.out.println("Average Rank : " + avgRank); }
+	 */
+
+	// /////////////////////////////////
+	public void displayFileRanks() {
 		clearConsole();
+		rankMappedByFileName.clear();
 
 		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
 		System.out.println("");
 
 		double avgRank = 0.0;
 		double total = 0.0;
-		double count = rankList.size();
+		double count = 0.0;
 
 		for (int i = 0; i < rankList.size(); i++) {
 			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
@@ -1105,147 +1134,128 @@ public class ClientNode implements Runnable {
 					+ rankList.get(i).getIp() + ", At: "
 					+ rankList.get(i).getTimestamp() + ")");
 
-			total += rankList.get(i).getValue();
+			if (!rankMappedByFileName
+					.containsKey(rankList.get(i).GetFileName())) {
+				ArrayList<Object> lst = new ArrayList<Object>();
+				rankMappedByFileName.put(rankList.get(i).GetFileName(), lst);
+			}
+
+			ArrayList<Object> resultList = rankMappedByFileName.get(rankList
+					.get(i).GetFileName());
+			resultList.add(rankList.get(i).getValue());
 
 		}
+		// total += rankList.get(i).getValue();
 
-		if (count > 0) {
-			avgRank = total / count;
+		for (int x = 0; x < rankList.size(); x++) {
+
+			avgRank = 0.0;
+			total = 0.0;
+			count = 0.0;
+
+			ArrayList<Object> finalList = new ArrayList<Object>();
+			String fileName = rankList.get(x).GetFileName();
+			finalList = rankMappedByFileName.get(fileName);
+
+			if (finalList != null) {
+
+				count = finalList.size();
+
+				for (int j = 0; j < count; j++) {
+					total += (Integer) finalList.get(j);
+				}
+
+				if (count > 0) {
+					avgRank = total / count;
+				}
+
+				System.out.println(fileName + " : Average Rank : " + avgRank);
+			}
 		}
 
-		System.out.println("Average Rank : " + avgRank);
 	}
 
-*/
-
-
-///////////////////////////////////
-public void displayFileRanks() {
-		clearConsole();
-                rankMappedByFileName.clear();
-
-		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
-		System.out.println("");
-                
-                double avgRank = 0.0;
-                double total = 0.0;
-                double count = 0.0;
-                
-                
-		for (int i = 0; i < rankList.size(); i++) {
-			System.out.println(rankList.get(i).GetFileName() + " (Rank : "
-					+ rankList.get(i).getValue() + " Ranked By: "
-					+ rankList.get(i).getIp() + ", At: "
-					+ rankList.get(i).getTimestamp() + ")");
-                        
-                        if(!rankMappedByFileName.containsKey(rankList.get(i).GetFileName()))
-                        {
-                            ArrayList<Object> lst = new ArrayList<Object>();
-                            rankMappedByFileName.put(rankList.get(i).GetFileName(),lst);
-                        }
-                        
-                       ArrayList<Object> resultList = rankMappedByFileName.get(rankList.get(i).GetFileName());
-                       resultList.add(rankList.get(i).getValue());                       
-                        
-                }
-                        //total += rankList.get(i).getValue();
-
-
-                for (int x = 0; x < rankList.size(); x++) {
-
-                    avgRank = 0.0;
-                    total = 0.0;
-                    count = 0.0;
-                
-                    ArrayList<Object> finalList = new ArrayList<Object>();
-                    String fileName = rankList.get(x).GetFileName();
-                    finalList = rankMappedByFileName.get(fileName);
-                    
-                    if(finalList != null)
-                    {
-                        
-                        count = finalList.size();
-                    
-                        for (int j = 0; j < count; j++) {
-                            total += (Integer)finalList.get(j); 
-                        }
-                        
-                       if(count > 0)
-                       {
-                            avgRank = total / count ;
-                       }
-                        
-                       System.out.println(fileName + " : Average Rank : "+ avgRank);
-                    }
-                }
-		
-                       
-        }
-	
-        
 	public void displayCommentRanks() {
 		clearConsole();
-                rankMapperdByCommentID.clear();
-		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
-                //Dictionary<String,String> ss = new Dictionary<String, String>
-                
-       
+		rankMapperdByCommentID.clear();
+		//Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
+		// Dictionary<String,String> ss = new Dictionary<String, String>
+		
+		/*Map<String, List<Rank>> groupedCommentRanks = new HashMap<String, List<Rank>>();
+		
+		for (int i = 0; i < comRankList.size(); i++) {
+			int key = comRankList.get(i).GetCommentId();
+			
+			if(groupedCommentRanks.containsKey(key))
+			{
+				
+			}
+		}*/
+
+		
+		for (int i = 0; i < comRankList.size(); i++) {
+		 System.out.println("Ranked by " + comRankList.get(i).getIp() + " to " + comRankList.get(i).GetCommentId()+ 
+				 " Rank "+ comRankList.get(i).getValue());
+		}
+		/*
 		System.out.println("");
-                
-                double avgRank = 0.0;
-                double total = 0.0;
-                double count = 0.0;
+
+		double avgRank = 0.0;
+		double total = 0.0;
+		double count = 0.0;
 
 		for (int i = 0; i < comRankList.size(); i++) {
 			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
 					+ comRankList.get(i).getValue() + " Ranked By: "
 					+ comRankList.get(i).getIp() + ", At: "
 					+ comRankList.get(i).getTimestamp() + ")");
-                        
-                        //total += comRankList.get(i).getValue();
-                        
-                         if(!rankMapperdByCommentID.containsKey(comRankList.get(i).GetCommentId()))
-                        {
-                            ArrayList<Object> lst = new ArrayList<Object>();
-                            rankMapperdByCommentID.put(comRankList.get(i).GetCommentId(),lst);
-                        }
-                        
-                       ArrayList<Object> resultList = rankMapperdByCommentID.get(comRankList.get(i).GetCommentId());
-                       resultList.add(comRankList.get(i).getValue());    
+
+			// total += comRankList.get(i).getValue();
+
+			if (!rankMapperdByCommentID.containsKey(comRankList.get(i)
+					.GetCommentId())) {
+				ArrayList<Object> lst = new ArrayList<Object>();
+				rankMapperdByCommentID.put(
+						Integer.toString(comRankList.get(i).GetCommentId()),
+						lst);
+			}
+
+			ArrayList<Object> resultList = rankMapperdByCommentID
+					.get(comRankList.get(i).GetCommentId());
+			resultList.add(comRankList.get(i).getValue());
 
 		}
-                
-                    for (int x = 0; x < comRankList.size(); x++) {
 
-                    avgRank = 0.0;
-                    total = 0.0;
-                    count = 0.0;
-                
-                    ArrayList<Object> finalList = new ArrayList<Object>();
-                    String cmId = comRankList.get(x).GetCommentId();
-                    finalList = rankMapperdByCommentID.get(cmId);
-                    
-                    if(finalList != null)
-                    {
-                        
-                        count = finalList.size();
-                    
-                        for (int j = 0; j < count; j++) {
-                            total += (Integer)finalList.get(j); 
-                        }
-                        
-                       if(count > 0)
-                       {
-                            avgRank = total / count ;
-                       }
-                        
-                       System.out.println(cmId + " : Average Rank : "+ avgRank);
-                    }
-                }
-                
-                System.out.println("Average Rank : "+ avgRank);
+		for (int x = 0; x < comRankList.size(); x++) {
+
+			avgRank = 0.0;
+			total = 0.0;
+			count = 0.0;
+
+			ArrayList<Object> finalList = new ArrayList<Object>();
+			int cmId = comRankList.get(x).GetCommentId();
+			finalList = rankMapperdByCommentID.get(cmId);
+
+			if (finalList != null) {
+
+				count = finalList.size();
+
+				for (int j = 0; j < count; j++) {
+					total += (Integer) finalList.get(j);
+				}
+
+				if (count > 0) {
+					avgRank = total / count;
+				}
+
+				System.out.println(cmId + " : Average Rank : " + avgRank);
+			}
+		}
+
+		System.out.println("Average Rank : " + avgRank);*/
 	}
-//////////////////////////////////
+
+	// ////////////////////////////////
 
 	public void displayAverageFileRanks(String fileName) {
 		clearConsole();
@@ -1274,32 +1284,29 @@ public void displayFileRanks() {
 		System.out.println("Average Rank : " + avgRank);
 	}
 
-	/*public void displayCommentRanks() {
-		clearConsole();
-
-		Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
-		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = comRankList.size();
-
-		for (int i = 0; i < comRankList.size(); i++) {
-			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
-					+ comRankList.get(i).getValue() + " Ranked By: "
-					+ comRankList.get(i).getIp() + ", At: "
-					+ comRankList.get(i).getTimestamp() + ")");
-
-			total += comRankList.get(i).getValue();
-
-		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
-	}*/
+	/*
+	 * public void displayCommentRanks() { clearConsole();
+	 * 
+	 * Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
+	 * System.out.println("");
+	 * 
+	 * double avgRank = 0.0; double total = 0.0; double count =
+	 * comRankList.size();
+	 * 
+	 * for (int i = 0; i < comRankList.size(); i++) {
+	 * System.out.println(comRankList.get(i).GetCommentId() + " (Rank : " +
+	 * comRankList.get(i).getValue() + " Ranked By: " +
+	 * comRankList.get(i).getIp() + ", At: " + comRankList.get(i).getTimestamp()
+	 * + ")");
+	 * 
+	 * total += comRankList.get(i).getValue();
+	 * 
+	 * }
+	 * 
+	 * if (count > 0) { avgRank = total / count; }
+	 * 
+	 * System.out.println("Average Rank : " + avgRank); }
+	 */
 
 	public void displayAverageCommentRanks() {
 		clearConsole();
@@ -1376,19 +1383,19 @@ public void displayFileRanks() {
 		return bIsAlreadyAvailable;
 	}
 
-	private static boolean isAlreadyAvailableCommentRank(Message rankMsg) {
-		boolean bIsAlreadyAvailable = false;
+	private static boolean isAlreadyAvailableCommentRank(Rank rankMsg) {
+		boolean isAlreadyAvailable = false;
 
-		for (int i = 0; i < g_oalMessageList.size(); i++) {
-			if (g_oalMessageList.get(i).getIp().equals(rankMsg.getIp())
-					) {
+		for (int i = 0; i < comRankList.size(); i++) {
+			if (comRankList.get(i).GetCommentId() == rankMsg.GetCommentId()
+					&& comRankList.get(i).getIp().equals(rankMsg.getIp())) {
 
-				bIsAlreadyAvailable = true;
+				isAlreadyAvailable = true;
 				break;
 			}
 		}
 
-		return bIsAlreadyAvailable;
+		return isAlreadyAvailable;
 	}
 
 	private static boolean isAlreadyAvailableCommentReply(Reply reply,
@@ -1407,7 +1414,7 @@ public void displayFileRanks() {
 
 		return bIsAlreadyAvailable;
 	}
-    
+
 	/* check for available file ranks */
 	private static boolean isAlreadyAvailableRank(Rank rank) {
 		boolean isAvailable = false;
@@ -1418,8 +1425,7 @@ public void displayFileRanks() {
 			if (rank.GetMode() == 1) // File rank
 			{
 				if (rankList.get(i).GetFileName().equals(rank.GetFileName())
-						&& rankList.get(i).getIp().equals(rank.getIp())
-						) {
+						&& rankList.get(i).getIp().equals(rank.getIp())) {
 
 					isAvailable = true;
 					break;
@@ -1458,4 +1464,3 @@ public void displayFileRanks() {
 		}
 	}
 }
-

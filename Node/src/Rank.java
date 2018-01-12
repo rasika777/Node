@@ -9,7 +9,7 @@ private int value;
 private String ip;
 private int timestamp;
 private String fileName;
-private String commentId;
+private int commentId;
 private int mode;
 
 public Rank(String ip, int timestamp, int value, String fileName, int mode)
@@ -21,11 +21,11 @@ public Rank(String ip, int timestamp, int value, String fileName, int mode)
 	this.mode = mode;
 }
 
-public Rank(String ip, int timestamp, String commentID, int value, int mode)
+public Rank(String ip, int timestamp, int commentID, int rank, int mode)
 {
 	this.ip = ip;
 	this.timestamp = timestamp;
-	this.value = value;
+	this.value = rank;
 	this.commentId = commentID;
 	this.mode = mode;
 }
@@ -50,7 +50,7 @@ public String GetFileName(){
 	return this.fileName;
 }
 
-public String GetCommentId(){
+public int GetCommentId(){
 	return this.commentId;
 }
 
