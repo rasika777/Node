@@ -2,18 +2,29 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
+<<<<<<< Updated upstream
 		<item value="finalList" key="selection"/>
+=======
+		<item value="SEROK" key="selection"/>
+>>>>>>> Stashed changes
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+<<<<<<< Updated upstream
 			<item value="finalList"/>
 			<item value="isAlreadyAvailableRank"/>
+=======
+			<item value="SEROK"/>
+			<item value="IsFileNameFound"/>
+			<item value="calculateAvgRank"/>
+			<item value="displayAverageFileRanks"/>
+			<item value="rankList"/>
+			<item value="distinct nodes"/>
+>>>>>>> Stashed changes
 			<item value="alMatchingFileNameList"/>
 			<item value="search started at"/>
-			<item value="REGOK"/>
-			<item value="getHostAddress"/>
 		</list>
 		<list key="replacehistory">
 		</list>
@@ -21,8 +32,14 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="312" key="DIALOG_WIDTH"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+<<<<<<< Updated upstream
 		<item value="576" key="DIALOG_HEIGHT"/>
 		<item value="878" key="DIALOG_X_ORIGIN"/>
 		<item value="168" key="DIALOG_Y_ORIGIN"/>
+=======
+		<item value="604" key="DIALOG_HEIGHT"/>
+		<item value="857" key="DIALOG_X_ORIGIN"/>
+		<item value="324" key="DIALOG_Y_ORIGIN"/>
+>>>>>>> Stashed changes
 	</section>
 </section>

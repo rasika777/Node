@@ -124,7 +124,7 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				Scanner rankGivenSc = new Scanner(System.in);
 				String fileRankGiven = rankGivenSc.nextLine();
 				int filRankValue = Integer.parseInt(fileRankGiven);
-				dcCommandHandling.rank(fileNameGiven, filRankValue, 1);
+				dcCommandHandling.rank(fileNameGiven.trim(), filRankValue, 1);
 				break;
 			case 9:
 				System.out.println("9: Display Forum is selected");
