@@ -73,7 +73,6 @@ public class ClientNode implements Runnable {
 
 			try {
 				// Incoming packet
-
 				DatagramPacket incomingPacket = receivePacket(clientSocket,
 						receiveData, receiveData.length);
 
@@ -456,7 +455,6 @@ public class ClientNode implements Runnable {
 
 							int iHopCount = Integer.parseInt(st[5]) + 1;
 
-							// ///////////////////////
 							for (int j = 0; j < neighbours.size(); j++) {
 								if (neighbours.get(j).getIp() != incomingPacket
 										.getAddress().getHostAddress()
@@ -480,8 +478,6 @@ public class ClientNode implements Runnable {
 
 								}
 							}
-
-							// ////////////////////////
 						}
 
 					}
@@ -1207,35 +1203,6 @@ public class ClientNode implements Runnable {
 		System.out.println("Average Rank : " + avgRank);*/
 	}
 
-	// ////////////////////////////////
-
-	public void displayAverageFileRanks(String fileName) {
-		clearConsole();
-
-		Collections.sort(rankList, Rank.COMPARE_BY_TIMESTAMP);
-		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = rankList.size();
-
-		for (int i = 0; i < rankList.size(); i++) {
-			// System.out.println(rankList.get(i).GetFileName() + " (Rank : "
-			// + rankList.get(i).getValue() + " Ranked By: "
-			// + rankList.get(i).getIp() + ", At: "
-			// + rankList.get(i).getTimestamp() + ")");
-			if (rankList.get(i).GetFileName().equals(fileName)) {
-				total += rankList.get(i).getValue();
-			}
-		}
-
-		if (count > 0) {
-			avgRank = total / count;
-		}
-
-		System.out.println("Average Rank : " + avgRank);
-	}
-
 	/*
 	 * public void displayCommentRanks() { clearConsole();
 	 * 
@@ -1376,7 +1343,7 @@ public class ClientNode implements Runnable {
 			if (rank.GetMode() == 1) {
 
 				// File rank
-				if (tmpRank.GetFileName().equals(rank.GetFileName())
+				if (tmpRank.GetFileName().toLowerCase().equals(rank.GetFileName().toLowerCase())
 						&& tmpRank.getIp().equals(rank.getIp())) {
 					isAvailable = true;
 					break;
@@ -1430,7 +1397,7 @@ public class ClientNode implements Runnable {
 		int iRankCount = 0;
 		
 		for (int i = 0; i < rankList.size(); i++) {
-			if (rankList.get(i).GetFileName().equals(p_sFileName)) {
+			if (rankList.get(i).GetFileName().toLowerCase().equals(p_sFileName.toLowerCase())) {
 				fTotalRank += rankList.get(i).getValue();
 				iRankCount++;
 			}

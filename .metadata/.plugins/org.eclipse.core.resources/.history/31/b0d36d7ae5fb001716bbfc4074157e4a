@@ -37,7 +37,8 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 			System.out.println("8: Rank a File");
 			System.out.println("9: Display Forum");
 			System.out.println("10: Display Comment Ranks");
-			System.out.println("11: Leave");
+			System.out.println("11: Display File Ranks");
+			System.out.println("12: Leave");
 			System.out.println("0: Exit");
 			System.out.println("");
 
@@ -81,8 +82,7 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				break;
 			case 6:
 				System.out.println("6: Comment Reply is selected");
-				
-				/* Getting input on which message to reply */
+				// Getting input on which message to reply
 				System.out
 						.println("Enter to which message you are going to reply: ");
 				Scanner soReadCommentToReply = new Scanner(System.in);
@@ -135,7 +135,11 @@ class ClientNode_ThreadNodeOperations implements Runnable {
 				dcCommandHandling.displayCommentRanks();
 				break;
 			case 11:
-				System.out.println("11: Leave is selected");
+				System.out.println("11: Display File Ranks is selected");
+				dcCommandHandling.displayFileRanks();
+				break;
+			case 12:
+				System.out.println("12: Leave is selected");
 				dcCommandHandling.nodeLeave();
 				break;
 			default:
