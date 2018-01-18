@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class ClientNode_ThreadMain
 {
 	public static DatagramSocket clientSocket;
-	//public static InetAddress IPAddress;
 	public static InetAddress IPv4Address;
 	static int listeningPort;
 	static String bsIP;    
