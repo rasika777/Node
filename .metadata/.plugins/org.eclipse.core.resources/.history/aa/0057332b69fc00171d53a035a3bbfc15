@@ -1,0 +1,52 @@
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+
+public class Test {
+
+	
+	public static void main(String args[])
+    {
+		
+		ArrayList<Rank> ranks = new ArrayList<Rank>();
+		
+		ranks.add(new Rank("5005", 1, 1, 3, 'c'));
+		ranks.add(new Rank("5002", 1, 1, 4, 'c'));
+		ranks.add(new Rank("5005", 1, 2, 2, 'c'));
+		
+		HashMap<Integer, Float> map = new HashMap<Integer, Float>();
+		
+		
+		for(Rank rank : ranks)
+		{
+			int key = rank.GetCommentId();
+			
+			if(map.containsKey(key))
+			{
+				System.out.println("key "+ key);
+				float avgrank = map.get(key);
+				float newAvgrank = (avgrank + rank.getValue()) / 2;
+				System.out.println("avg "+ newAvgrank);
+				map.put(key, newAvgrank);
+			}
+			else
+			{
+				System.out.println("No key "+ key);
+				float avgrank = rank.getValue();
+				map.put(key, avgrank);
+				
+			}
+				
+		}
+		
+		
+		for(int commentId : map.keySet())
+		{
+			float distinctRanks = map.get(commentId);
+			
+			System.out.println("Comment Id " + commentId);
+			System.out.println("Rank " + distinctRanks);
+		}
+    }
+}

@@ -33,7 +33,6 @@ public class ClientNode implements Runnable {
 																					// list
 
 	HashMap<String, ArrayList<Object>> rankMappedByFileName = new HashMap<String, ArrayList<Object>>();
-	HashMap<String, ArrayList<Object>> rankMapperdByCommentID = new HashMap<String, ArrayList<Object>>(); // in
 	// the
 	// forum
 	private static ArrayList<Rank> rankList = new ArrayList<Rank>();// Rank list
@@ -433,7 +432,7 @@ public class ClientNode implements Runnable {
 									&& g_oalMessageList.get(j).getTimestamp() == Integer
 											.parseInt(st[7])) {
 
-								commentId = j;
+								commentId = j + 1;
 
 							}
 						}
@@ -1177,82 +1176,38 @@ public class ClientNode implements Runnable {
 
 	public void displayCommentRanks() {
 		clearConsole();
-		rankMapperdByCommentID.clear();
-		//Collections.sort(comRankList, Rank.COMPARE_BY_TIMESTAMP);
-		// Dictionary<String,String> ss = new Dictionary<String, String>
 		
-		/*Map<String, List<Rank>> groupedCommentRanks = new HashMap<String, List<Rank>>();
+		HashMap<Integer, Float> map = new HashMap<Integer, Float>();
 		
-		for (int i = 0; i < comRankList.size(); i++) {
-			int key = comRankList.get(i).GetCommentId();
+		
+		for(Rank rank : comRankList)
+		{
+			int key = rank.GetCommentId();
 			
-			if(groupedCommentRanks.containsKey(key))
+			if(map.containsKey(key))
 			{
+				float avgrank = map.get(key);
+				avgrank = (avgrank + rank.getValue()) / 2;
+				map.put(key, avgrank);
+			}
+			else
+			{
+				float avgrank = rank.getValue();
+				map.put(key, avgrank);
 				
 			}
-		}*/
-
+				
+		}
 		
-		for (int i = 0; i < comRankList.size(); i++) {
-		 System.out.println("Ranked by " + comRankList.get(i).getIp() + " to " + comRankList.get(i).GetCommentId()+ 
-				 " Rank "+ comRankList.get(i).getValue());
-		}
-		/*
-		System.out.println("");
-
-		double avgRank = 0.0;
-		double total = 0.0;
-		double count = 0.0;
-
-		for (int i = 0; i < comRankList.size(); i++) {
-			System.out.println(comRankList.get(i).GetCommentId() + " (Rank : "
-					+ comRankList.get(i).getValue() + " Ranked By: "
-					+ comRankList.get(i).getIp() + ", At: "
-					+ comRankList.get(i).getTimestamp() + ")");
-
-			// total += comRankList.get(i).getValue();
-
-			if (!rankMapperdByCommentID.containsKey(comRankList.get(i)
-					.GetCommentId())) {
-				ArrayList<Object> lst = new ArrayList<Object>();
-				rankMapperdByCommentID.put(
-						Integer.toString(comRankList.get(i).GetCommentId()),
-						lst);
-			}
-
-			ArrayList<Object> resultList = rankMapperdByCommentID
-					.get(comRankList.get(i).GetCommentId());
-			resultList.add(comRankList.get(i).getValue());
+		
+		for(int commentId : map.keySet())
+		{
+			float distinctRanks = map.get(commentId);
+			
+			System.out.println("Comment Id : " + commentId + " Avearage Rank : " + distinctRanks);
 
 		}
-
-		for (int x = 0; x < comRankList.size(); x++) {
-
-			avgRank = 0.0;
-			total = 0.0;
-			count = 0.0;
-
-			ArrayList<Object> finalList = new ArrayList<Object>();
-			int cmId = comRankList.get(x).GetCommentId();
-			finalList = rankMapperdByCommentID.get(cmId);
-
-			if (finalList != null) {
-
-				count = finalList.size();
-
-				for (int j = 0; j < count; j++) {
-					total += (Integer) finalList.get(j);
-				}
-
-				if (count > 0) {
-					avgRank = total / count;
-				}
-
-				System.out.println(cmId + " : Average Rank : " + avgRank);
-			}
-		}
-
-		System.out.println("Average Rank : " + avgRank);*/
+		
 	}
 
 	// ////////////////////////////////
