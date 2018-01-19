@@ -1002,10 +1002,9 @@ public class ClientNode implements Runnable {
 			// for rank files
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
-			/* Add rank to the forum in the current node */
-			Rank rankObj = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					commentId, rank, option);
-
+			/* Add rank to the forum in the current node */		
+			 Rank rankObj = new Rank(IPAddress.getHostAddress(), g_iTimeStamp, commentId, rank, option);
+			 
 			// check file name contins or not, add only if contains
 			if (!isAlreadyAvailableCommentRank(rankObj)) {
 				comRankList.add(rankObj);

@@ -216,16 +216,12 @@ public class ClientNode implements Runnable {
 						for (int i = 0; i < alMatchingFileNameList.size(); i++) {
 							fileList += alMatchingFileNameList.get(i);
 						}
-
-						/*
-						 * Calculate file rank only if one matching file name is
-						 * found
-						 */
+						
+						/* Calculate file rank only if one matching file name is found */
 						String sRank = "-1";
 						if (alMatchingFileNameList.size() == 1) {
-							sRank = calculateAvgRank(alMatchingFileNameList
-									.get(0));
-						}
+							sRank = calculateAvgRank(alMatchingFileNameList.get(0));
+						}							
 
 						ArrayList<String> salSearchResponseMsg = new ArrayList<String>(
 								Arrays.asList("SEROK", splittedResult[2],
@@ -405,27 +401,23 @@ public class ClientNode implements Runnable {
 																			// count
 							for (int j = 0; j < neighbours.size(); j++) {
 
-								if (neighbours.get(j).getIp() != incomingPacket
-										.getAddress().getHostAddress()
-										&& iHopCount < 11) {
-
+								
+								 if (neighbours.get(j).getIp() != incomingPacket
+								 .getAddress().getHostAddress() && iHopCount < 11) {
+	
 									ArrayList<String> salRankMsg = new ArrayList<String>(
-											Arrays.asList(
-													"RANK",
-													"F",
-													st[3],
+											Arrays.asList("RANK", "F", st[3],
 													st[4],
 													Integer.toString(iHopCount),
 													fileName, rankVal));
-
+	
 									String sRankMsg = createMessage(salRankMsg);
-
-									sendPacket(clientSocket,
-											sRankMsg.getBytes(),
+	
+									sendPacket(clientSocket, sRankMsg.getBytes(),
 											sRankMsg.length(),
-											InetAddress.getByName(neighbours
-													.get(j).getIp()),
-											neighbours.get(j).getPort());
+											InetAddress.getByName(neighbours.get(j)
+													.getIp()), neighbours.get(j)
+													.getPort());
 								}
 							}
 						}
@@ -776,11 +768,11 @@ public class ClientNode implements Runnable {
 				System.out
 						.println(i + 1 + ". " + alMatchingFileNameList.get(i));
 			}
-
+			
 			if (alMatchingFileNameList.size() == 1) {
-				System.out.println("Average rank: "
-						+ calculateAvgRank(alMatchingFileNameList.get(0)));
-			} else {
+				System.out.println("Average rank: " + calculateAvgRank(alMatchingFileNameList.get(0)));
+			}
+			else {
 				System.out.println("Average rank: -1 (Multiple files found)");
 			}
 		}
@@ -888,12 +880,12 @@ public class ClientNode implements Runnable {
 					.parseInt(p_saSERCommandSplitted[p_saSERCommandSplitted.length - 1]);
 			iHopCount++;
 			salResponseMsg.add(Integer.toString(iHopCount));
-
+			
 			/* Add average file rank */
 			if (alMatchingFileNameList.size() == 1) {
-				salResponseMsg.add(calculateAvgRank(alMatchingFileNameList
-						.get(0)));
-			} else {
+				salResponseMsg.add(calculateAvgRank(alMatchingFileNameList.get(0)));
+			}
+			else {
 				salResponseMsg.add("-1");
 			}
 
@@ -959,8 +951,13 @@ public class ClientNode implements Runnable {
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
-			Rank oRank = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					rank, rankInput, option);
+			// changing Ip to port to test as distinct nodes
+			/*
+			 * Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+			 * rank, rankInput, option);
+			 */
+			Rank oRank = new Rank(Integer.toString(listeningPort),
+					g_iTimeStamp, rank, rankInput, option);
 
 			// Check whether file name exists in the node and add only if it
 			// contains
@@ -971,8 +968,15 @@ public class ClientNode implements Runnable {
 			/* Create rank message */
 			int iHopCount = 0;
 
+			// changing Ip to port to test as distinct nodes
+			/*
+			 * ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
+			 * "RANK", "F", IPAddress.getHostAddress(),
+			 * Integer.toString(g_iTimeStamp), Integer.toString(iHopCount),
+			 * rankInput.trim(), Integer.toString(rank)));
+			 */
 			ArrayList<String> rankMsg = new ArrayList<String>(Arrays.asList(
-					"RANK", "F", IPAddress.getHostAddress(),
+					"RANK", "F", Integer.toString(listeningPort),
 					Integer.toString(g_iTimeStamp),
 					Integer.toString(iHopCount), rankInput.trim(),
 					Integer.toString(rank)));
@@ -1003,8 +1007,13 @@ public class ClientNode implements Runnable {
 			g_iTimeStamp++; // Increment logical time stamp by 1
 
 			/* Add rank to the forum in the current node */
-			Rank rankObj = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
-					commentId, rank, option);
+			// changing Ip to port to test as distinct nodes
+			/*
+			 * Rank oMsg = new Rank(IPAddress.getHostAddress(), g_iTimeStamp,
+			 * key, rank, option);
+			 */
+			Rank rankObj = new Rank(Integer.toString(listeningPort),
+					g_iTimeStamp, commentId, rank, option);
 
 			// check file name contins or not, add only if contains
 			if (!isAlreadyAvailableCommentRank(rankObj)) {
@@ -1115,35 +1124,41 @@ public class ClientNode implements Runnable {
 
 	public void displayCommentRanks() {
 		clearConsole();
-
+		
 		HashMap<Integer, Float> map = new HashMap<Integer, Float>();
-
-		for (Rank rank : comRankList) {
+		
+		
+		for(Rank rank : comRankList)
+		{
 			int key = rank.GetCommentId();
-
-			if (map.containsKey(key)) {
+			
+			if(map.containsKey(key))
+			{
 				float avgrank = map.get(key);
 				avgrank = (avgrank + rank.getValue()) / 2;
 				map.put(key, avgrank);
 			}
 
-			else {
+			else
+			{
 				float avgrank = rank.getValue();
 				map.put(key, avgrank);
-
+				
 			}
-
+				
 		}
-
-		for (int commentId : map.keySet()) {
+		
+		
+		for(int commentId : map.keySet())
+		{
 			float distinctRanks = map.get(commentId);
-
-			System.out.println("Comment Id : " + commentId
-					+ " Avearage Rank : " + distinctRanks);
+			
+			System.out.println("Comment Id : " + commentId + " Avearage Rank : " + distinctRanks);
 
 		}
 
 	}
+
 
 	public void displayAverageCommentRanks() {
 		clearConsole();
@@ -1222,7 +1237,7 @@ public class ClientNode implements Runnable {
 
 	private static boolean isAlreadyAvailableCommentRank(Rank rankMsg) {
 		boolean isAlreadyAvailable = false;
-
+		
 		for (int i = 0; i < comRankList.size(); i++) {
 			if (comRankList.get(i).GetCommentId() == rankMsg.GetCommentId()
 					&& comRankList.get(i).getIp().equals(rankMsg.getIp())) {
@@ -1261,8 +1276,7 @@ public class ClientNode implements Runnable {
 			if (rank.GetMode() == 1) {
 
 				// File rank
-				if (tmpRank.GetFileName().toLowerCase()
-						.equals(rank.GetFileName().toLowerCase())
+				if (tmpRank.GetFileName().toLowerCase().equals(rank.GetFileName().toLowerCase())
 						&& tmpRank.getIp().equals(rank.getIp())) {
 					isAvailable = true;
 					break;
@@ -1301,20 +1315,22 @@ public class ClientNode implements Runnable {
 			System.out.flush();
 		}
 	}
-
+	
 	/*
-	 * Method : calculateAvgRank Description : Calculate average rank for a
-	 * specific file Parameter <p_sFileName> : File name Return : Average rank
-	 * as a String Created : 201/12/25, Rasika Bandara Updates : -
+	 * Method 					: calculateAvgRank
+	 * Description 				: Calculate average rank for a specific file
+	 * Parameter <p_sFileName> 	: File name 
+	 * Return 					: Average rank as a String 
+	 * Created 					: 201/12/25, Rasika Bandara
+	 * Updates					: -
 	 */
 	private static String calculateAvgRank(String p_sFileName) {
 		float fAvgRank = 0;
 		float fTotalRank = 0;
 		int iRankCount = 0;
-
+		
 		for (int i = 0; i < rankList.size(); i++) {
-			if (rankList.get(i).GetFileName().toLowerCase()
-					.equals(p_sFileName.toLowerCase())) {
+			if (rankList.get(i).GetFileName().toLowerCase().equals(p_sFileName.toLowerCase())) {
 				fTotalRank += rankList.get(i).getValue();
 				iRankCount++;
 			}
@@ -1322,12 +1338,13 @@ public class ClientNode implements Runnable {
 
 		if (iRankCount > 0) {
 			fAvgRank = fTotalRank / iRankCount;
-		} else {
+		}
+		else {
 			fAvgRank = 0;
 		}
-
+		
 		String sAvgRank = String.format("%.1f", fAvgRank);
-
-		return sAvgRank;
+		
+		return sAvgRank;		
 	}
 }
